@@ -1,0 +1,63 @@
+{
+  "type": "mod",
+  "id": "nox.session",
+  "provides": [
+    "session"
+  ],
+  "name": "Sessions",
+  "version": "1.0.0",
+  "description": "Provides session management.",
+  "license": "GPL-3.0",
+  "icon": null,
+  "contact": {
+    "email": "hactazia@gmail.com",
+    "source": "https://github.com/AtelierVR/api.nox.session",
+    "website": "https://nox.hactazia.fr/",
+    "issues": "https://github.com/AtelierVR/api.nox.session/issues"
+  },
+  "authors": [
+    {
+      "name": "Hactazia",
+      "email": "hactazia@gmail.com",
+      "website": "https://hactazia.fr/"
+    }
+  ],
+  "contributors": [],
+  "relations": [
+    {
+      "id": "terminal",
+      "type": "depends"
+    },
+    {
+      "id": "world",
+      "type": "depends"
+    },
+    {
+      "id": "search",
+      "type": "depends"
+    },
+    {
+      "id": "player",
+      "type": "depends"
+    },
+    {
+      "id": "entity",
+      "type": "depends"
+    },
+    {
+      "id": "controller",
+      "type": "depends"
+    },
+    {
+      "id": "ui",
+      "type": "depends"
+    }
+  ],
+  "entrypoints": {
+    "main": [
+      "Nox.Sessions.Runtime.Main"
+    ]
+  },
+  "references": [],
+  "permissions": []
+}

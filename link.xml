@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<linker>
+	<assembly fullname="Nox.CCK.Sessions" preserve="all" />
+	<assembly fullname="Nox.Mods.Sessions" preserve="all" />
+	<assembly fullname="Nox.Sessions" preserve="all" />
+	<assembly fullname="Nox.Sessions.Runtime" preserve="all" />
+</linker>

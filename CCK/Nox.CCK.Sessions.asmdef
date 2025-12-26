@@ -1,0 +1,23 @@
+{
+    "name": "Nox.CCK.Sessions",
+    "rootNamespace": "",
+    "references": [
+        "UniTask",
+        "Nox.Sessions",
+        "Nox.CCK",
+        "Nox.Players",
+        "Nox.Entities",
+        "Nox.Worlds",
+        "Nox.Instances",
+        "Nox.Users"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
