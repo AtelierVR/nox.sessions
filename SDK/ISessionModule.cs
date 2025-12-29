@@ -42,7 +42,7 @@ namespace Nox.Sessions {
 		/// <param name="current"></param>
 		/// <param name="previous"></param>
 		public void OnAuthorityTransferred(IPlayer current, IPlayer previous) { }
-		
+
 		/// <summary>
 		/// Invoked when a player's visibility changes within the session.
 		/// When the player has now a physical representation in the session, the bool is true.
@@ -65,7 +65,7 @@ namespace Nox.Sessions {
 		/// </summary>
 		/// <param name="index"></param>
 		public void OnSceneUnloaded(int index) { }
-		
+
 		/// <summary>
 		/// Invoked when an entity is registered to the session.
 		/// </summary>
@@ -81,9 +81,9 @@ namespace Nox.Sessions {
 		/// <summary>
 		/// Invoked when a custom event is triggered within the session.
 		/// </summary>
-		/// <param name="event"></param>
-		/// <param name="raw"></param>
+		/// <param name="name"></param>
+		/// <param name="payload"></param>
 		/// <param name="sender"></param>
-		public void OnEventTriggered(string @event, byte[] raw, IPlayer sender) { }
+		public void OnEvent(long name, byte[] payload, IPlayer sender) { }
 	}
 }

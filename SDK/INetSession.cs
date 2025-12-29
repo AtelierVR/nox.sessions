@@ -12,13 +12,15 @@ namespace Nox.Sessions {
 
 		/// <summary>
 		/// The utc time of the server.
+		/// If not connected, returns <see cref="DateTime.MinValue"/>.
 		/// </summary>
 		public DateTime Time { get; }
 
 		/// <summary>
 		/// The ping to the server in milliseconds.
+		/// If not connected, returns -1.
 		/// </summary>
-		public int Ping { get; }
+		public double Ping { get; }
 
 		/// <summary>
 		/// Invoked when the session successfully connects to the network.

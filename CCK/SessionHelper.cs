@@ -12,6 +12,7 @@ namespace Nox.CCK.Sessions {
 		private const string Title           = "title";
 		private const string Thumbnail       = "thumbnail";
 		private const string Instance        = "instance";
+		private const string World           = "world";
 
 		public static bool IsDisposeOnChange(this ISession session)
 			=> session.TryGetProperty<bool>(PropertyHelper.StringToKey(DisposeOnChange), out var value) && value;
@@ -73,6 +74,21 @@ namespace Nox.CCK.Sessions {
 			epo.SetProperty(PropertyHelper.StringToKey(Instance), instance);
 		}
 
+		public static IWorldIdentifier GetWorld(this ISession session) {
+			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(World), out var value))
+				return null;
+			return value switch {
+				IWorldIdentifier identifier => identifier,
+				Func<IWorldIdentifier> func => func(),
+				_                           => null
+			};
+		}
+
+		public static void SetWorld(this ISession session, IWorldIdentifier world) {
+			if (session is not IEditablePropertyObject epo) return;
+			epo.SetProperty(PropertyHelper.StringToKey(World), world);
+		}
+		
 		public static bool IsFinished(this IState state)
 			=> state.IsReady() || state.IsError();
 
