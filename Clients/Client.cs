@@ -1,4 +1,5 @@
 using System;
+using Nox.CCK.Language;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Events;
 using Nox.CCK.Mods.Initializers;
@@ -28,7 +29,7 @@ namespace Nox.Sessions.Clients {
 		/// <summary>
 		/// UI API access helper.
 		/// </summary>
-		internal static IUiAPI UiAPI
+		static internal IUiAPI UiAPI
 			=> API?.ModAPI
 				?.GetMod("ui")
 				?.GetInstance<IUiAPI>();
@@ -45,7 +46,6 @@ namespace Nox.Sessions.Clients {
 		public void OnInitializeClient(IClientModCoreAPI api) {
 			Instance = this;
 			API = api;
-
 			SubscribeToEvents();
 		}
 

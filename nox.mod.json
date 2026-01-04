@@ -1,6 +1,6 @@
 {
   "type": "mod",
-  "id": "nox.session",
+  "id": "nox.sessions",
   "provides": [
     "session"
   ],

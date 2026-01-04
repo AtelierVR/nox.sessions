@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Nox.CCK.Language;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
 using Nox.CCK.Sessions;
@@ -12,6 +13,7 @@ namespace Nox.Sessions.Runtime {
 
 		public static Main Instance { get; private set; }
 
+
 		internal ISession GetCurrentSession() {
 			if (Current == null)
 				return null;
@@ -20,13 +22,15 @@ namespace Nox.Sessions.Runtime {
 		}
 
 		public string Current { get; private set; }
-
+		private LanguagePack _lang;
 		private readonly HashSet<ISession> _sessions = new();
 
 
 		public void OnInitializeMain(IMainModCoreAPI api) {
 			CoreAPI = api;
 			Instance = this;
+			_lang = api.AssetAPI.GetAsset<LanguagePack>("lang.asset");
+			LanguageManager.AddPack(_lang);
 		}
 
 		private async UniTask CloseAll() {
@@ -38,6 +42,7 @@ namespace Nox.Sessions.Runtime {
 			}
 
 			_sessions.Clear();
+			LanguageManager.RemovePack(_lang);
 		}
 
 		public async UniTask OnDisposeMainAsync() {
@@ -112,7 +117,7 @@ namespace Nox.Sessions.Runtime {
 
 			if (oSession != null)
 				await oSession.OnDeselect(nSession);
-			
+
 			if (nSession != null)
 				await nSession.OnSelect(oSession);
 
