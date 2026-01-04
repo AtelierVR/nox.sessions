@@ -29,27 +29,11 @@
       "type": "depends"
     },
     {
-      "id": "world",
-      "type": "depends"
-    },
-    {
-      "id": "search",
-      "type": "depends"
-    },
-    {
       "id": "player",
       "type": "depends"
     },
     {
       "id": "entity",
-      "type": "depends"
-    },
-    {
-      "id": "controller",
-      "type": "depends"
-    },
-    {
-      "id": "ui",
       "type": "depends"
     }
   ],
