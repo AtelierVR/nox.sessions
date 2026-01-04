@@ -7,9 +7,9 @@ using UnityEngine.Events;
 
 namespace Nox.Sessions.Runtime {
 	public class Main : IMainModInitializer, ISessionAPI {
-		internal static IMainModCoreAPI CoreAPI { get; private set; }
+		public static IMainModCoreAPI CoreAPI { get; private set; }
 
-		internal static Main Instance { get; private set; }
+		public static Main Instance { get; private set; }
 
 		internal ISession GetCurrentSession() {
 			if (Current == null)
@@ -24,7 +24,7 @@ namespace Nox.Sessions.Runtime {
 
 
 		public void OnInitializeMain(IMainModCoreAPI api) {
-			CoreAPI  = api;
+			CoreAPI = api;
 			Instance = this;
 		}
 
@@ -47,7 +47,7 @@ namespace Nox.Sessions.Runtime {
 			_registers.Clear();
 
 			Instance = null;
-			CoreAPI  = null;
+			CoreAPI = null;
 		}
 
 		#if UNITY_EDITOR
@@ -76,7 +76,8 @@ namespace Nox.Sessions.Runtime {
 				if (_sessions.Count > 1) {
 					var otherSession = _sessions.First(s => s.Id != session.Id);
 					SetCurrent(otherSession.Id).Forget();
-				} else SetCurrent(null).Forget();
+				}
+				else SetCurrent(null).Forget();
 			}
 
 			_sessions.Remove(session);

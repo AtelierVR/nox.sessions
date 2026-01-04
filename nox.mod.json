@@ -25,6 +25,10 @@
   "contributors": [],
   "relations": [
     {
+      "id": "ui",
+      "type": "depends"
+    },
+    {
       "id": "terminal",
       "type": "depends"
     },
@@ -40,6 +44,9 @@
   "entrypoints": {
     "main": [
       "Nox.Sessions.Runtime.Main"
+    ],
+    "client": [
+      "Nox.Sessions.Clients.Client"
     ]
   },
   "references": [],

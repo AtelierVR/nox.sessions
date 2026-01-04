@@ -3,5 +3,6 @@
 	<assembly fullname="Nox.CCK.Sessions" preserve="all" />
 	<assembly fullname="Nox.Mods.Sessions" preserve="all" />
 	<assembly fullname="Nox.Sessions" preserve="all" />
+	<assembly fullname="Nox.Sessions.Clients" preserve="all" />
 	<assembly fullname="Nox.Sessions.Runtime" preserve="all" />
 </linker>

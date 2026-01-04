@@ -8,22 +8,23 @@ using UnityEngine;
 
 namespace Nox.CCK.Sessions {
 	public static class SessionHelper {
-		private const string DisposeOnChange = "dispose_change";
-		private const string Title           = "title";
-		private const string Thumbnail       = "thumbnail";
-		private const string Instance        = "instance";
-		private const string World           = "world";
+		private const string DISPOSE_ON_CHANGE = "dispose_change";
+		private const string TITLE = "title";
+		private const string SHORT_NAME = "short_name";
+		private const string THUMBNAIL = "thumbnail";
+		private const string INSTANCE = "instance";
+		private const string WORLD = "world";
 
 		public static bool IsDisposeOnChange(this ISession session)
-			=> session.TryGetProperty<bool>(PropertyHelper.StringToKey(DisposeOnChange), out var value) && value;
+			=> session.TryGetProperty<bool>(PropertyHelper.StringToKey(DISPOSE_ON_CHANGE), out var value) && value;
 
 		public static void SetDisposeOnChange(this ISession session, bool value) {
 			if (session is not IEditablePropertyObject epo) return;
-			epo.SetProperty(PropertyHelper.StringToKey(DisposeOnChange), value);
+			epo.SetProperty(PropertyHelper.StringToKey(DISPOSE_ON_CHANGE), value);
 		}
 
 		public static string GetTitle(this ISession session) {
-			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(Title), out var value))
+			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(TITLE), out var value))
 				return string.Empty;
 			return value switch {
 				string str        => str,
@@ -34,11 +35,11 @@ namespace Nox.CCK.Sessions {
 
 		public static void SetTitle(this ISession session, string title) {
 			if (session is not IEditablePropertyObject epo) return;
-			epo.SetProperty(PropertyHelper.StringToKey(Title), title);
+			epo.SetProperty(PropertyHelper.StringToKey(TITLE), title);
 		}
 
 		public static async UniTask<Texture2D> GetThumbnail(this ISession session) {
-			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(Thumbnail), out var value))
+			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(THUMBNAIL), out var value))
 				return null;
 			return value switch {
 				Texture2D tex                 => tex,
@@ -50,7 +51,7 @@ namespace Nox.CCK.Sessions {
 
 		public static void SetThumbnail(this ISession session, Texture2D thumbnail) {
 			if (session is not IEditablePropertyObject epo) return;
-			epo.SetProperty(PropertyHelper.StringToKey(Thumbnail), thumbnail);
+			epo.SetProperty(PropertyHelper.StringToKey(THUMBNAIL), thumbnail);
 		}
 
 		public static bool IsCurrent(ISessionAPI api, ISession session)
@@ -60,7 +61,7 @@ namespace Nox.CCK.Sessions {
 			=> session.Dimensions.Identifier?.Equals(world) ?? false;
 
 		public static IInstanceIdentifier GetInstance(this ISession session) {
-			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(Instance), out var value))
+			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(INSTANCE), out var value))
 				return null;
 			return value switch {
 				IInstanceIdentifier identifier => identifier,
@@ -71,11 +72,11 @@ namespace Nox.CCK.Sessions {
 
 		public static void SetInstance(this ISession session, IInstanceIdentifier instance) {
 			if (session is not IEditablePropertyObject epo) return;
-			epo.SetProperty(PropertyHelper.StringToKey(Instance), instance);
+			epo.SetProperty(PropertyHelper.StringToKey(INSTANCE), instance);
 		}
 
 		public static IWorldIdentifier GetWorld(this ISession session) {
-			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(World), out var value))
+			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(WORLD), out var value))
 				return null;
 			return value switch {
 				IWorldIdentifier identifier => identifier,
@@ -86,9 +87,24 @@ namespace Nox.CCK.Sessions {
 
 		public static void SetWorld(this ISession session, IWorldIdentifier world) {
 			if (session is not IEditablePropertyObject epo) return;
-			epo.SetProperty(PropertyHelper.StringToKey(World), world);
+			epo.SetProperty(PropertyHelper.StringToKey(WORLD), world);
 		}
-		
+
+		public static string GetShortName(this ISession session) {
+			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(SHORT_NAME), out var value))
+				return null;
+			return value switch {
+				string str        => str,
+				Func<string> func => func(),
+				_                 => value?.ToString()
+			};
+		}
+
+		public static void SetShortName(this ISession session, string shortName) {
+			if (session is not IEditablePropertyObject epo) return;
+			epo.SetProperty(PropertyHelper.StringToKey(SHORT_NAME), shortName);
+		}
+
 		public static bool IsFinished(this IState state)
 			=> state.IsReady() || state.IsError();
 

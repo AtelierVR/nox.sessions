@@ -1,0 +1,24 @@
+{
+    "name": "Nox.Sessions.Clients",
+    "rootNamespace": "",
+    "references": [
+        "UniTask",
+        "Nox.CCK",
+        "Nox.Sessions",
+        "Nox.Terminals",
+        "Nox.Players",
+        "Nox.Entities",
+        "Nox.UI",
+        "Nox.Sessions.Runtime",
+        "Nox.CCK.Sessions"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
