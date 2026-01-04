@@ -7,7 +7,8 @@
         "Nox.Sessions",
         "Nox.Terminals",
         "Nox.Players",
-        "Nox.Entities"
+        "Nox.Entities",
+        "Nox.CCK.Sessions"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

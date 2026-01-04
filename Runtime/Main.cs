@@ -3,6 +3,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
+using Nox.CCK.Sessions;
 using UnityEngine.Events;
 
 namespace Nox.Sessions.Runtime {
@@ -111,11 +112,17 @@ namespace Nox.Sessions.Runtime {
 
 			if (oSession != null)
 				await oSession.OnDeselect(nSession);
+			
 			if (nSession != null)
 				await nSession.OnSelect(oSession);
 
 			OnCurrentChanged.Invoke(oSession, nSession);
 			CoreAPI.EventAPI.Emit("session_current_changed", oSession, nSession);
+
+			if (oSession?.IsDisposeOnChange() ?? false) {
+				await oSession.Dispose();
+				Remove(oSession);
+			}
 		}
 
 		public UnityEvent<ISession> OnSessionAdded { get; } = new();
