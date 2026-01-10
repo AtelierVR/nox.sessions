@@ -186,6 +186,7 @@ namespace Nox.Sessions.Clients.Components {
 				Destroy(child.gameObject);
 			}
 
+			await UniTask.Yield();
 			// TODO: Add navigation items based on session handlers
 			// This would be similar to the handlers in api.nox.session
 		}
