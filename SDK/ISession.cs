@@ -2,10 +2,12 @@ using Cysharp.Threading.Tasks;
 using Nox.CCK.Properties;
 using Nox.Entities;
 using Nox.Players;
+using Nox.Worlds;
 using UnityEngine.Events;
 
 namespace Nox.Sessions {
-	public interface ISession : ISession<IDimensions, IEntities> { }
+	public interface ISession : ISession<IDimensions, IEntities> {
+	}
 
 	public interface ISession<out TDimension, out TEntities> : IPropertyObject
 		where TDimension : IDimensions
@@ -40,10 +42,29 @@ namespace Nox.Sessions {
 		/// </summary>
 		public IState State { get; }
 
+		/// <summary>
+		/// Disposes the session and releases all associated resources.
+		/// </summary>
+		/// <returns></returns>
 		public UniTask Dispose();
+		
+		/// <summary>
+		/// Updates the session state.
+		/// </summary>
+		public void Update();
 
+		/// <summary>
+		/// Invoked when the session is selected.
+		/// </summary>
+		/// <param name="old"></param>
+		/// <returns></returns>
 		public UniTask OnSelect(ISession old);
 
+		/// <summary>
+		/// Invoked when the session is deselected.
+		/// </summary>
+		/// <param name="new"></param>
+		/// <returns></returns>
 		public UniTask OnDeselect(ISession @new);
 
 		/// <summary>
@@ -57,7 +78,7 @@ namespace Nox.Sessions {
 		/// Is called before entity unregistration.
 		/// </summary>
 		public UnityEvent<IPlayer> OnPlayerLeft { get; }
-		
+
 		/// <summary>
 		/// Invoked when authority over a player is transferred.
 		/// The first IPlayer is the new authority holder.
@@ -86,5 +107,12 @@ namespace Nox.Sessions {
 		/// Invoked when the session's state changes.
 		/// </summary>
 		UnityEvent<IState> OnStateChanged { get; }
+
+		/// <summary>
+		/// Checks if the session matches the given world identifier.
+		/// </summary>
+		/// <param name="identifier"></param>
+		/// <returns></returns>
+		bool Match(IWorldIdentifier identifier);
 	}
 }

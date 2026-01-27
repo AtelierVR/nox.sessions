@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -5,6 +6,8 @@ using Nox.CCK.Language;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
 using Nox.CCK.Sessions;
+using Nox.Sessions.Runtime.Settings;
+using Nox.Settings;
 using UnityEngine.Events;
 
 namespace Nox.Sessions.Runtime {
@@ -13,6 +16,10 @@ namespace Nox.Sessions.Runtime {
 
 		public static Main Instance { get; private set; }
 
+		static internal ISettingAPI SettingAPI
+			=> CoreAPI?.ModAPI
+				?.GetMod("settings")
+				?.GetInstance<ISettingAPI>();
 
 		internal ISession GetCurrentSession() {
 			if (Current == null)
@@ -24,6 +31,7 @@ namespace Nox.Sessions.Runtime {
 		public string Current { get; private set; }
 		private LanguagePack _lang;
 		private readonly HashSet<ISession> _sessions = new();
+		private IHandler[] _handlers = Array.Empty<IHandler>();
 
 
 		public void OnInitializeMain(IMainModCoreAPI api) {
@@ -31,7 +39,17 @@ namespace Nox.Sessions.Runtime {
 			Instance = this;
 			_lang = api.AssetAPI.GetAsset<LanguagePack>("lang.asset");
 			LanguageManager.AddPack(_lang);
+			_handlers = new IHandler[] {
+				new RenderEntity(),
+				new ClearPhysical()
+			};;
+			foreach (var handler in _handlers)
+				SettingAPI.Add(handler);
 		}
+
+		public void OnUpdateMain()
+			=> GetCurrentSession()
+				?.Update();
 
 		private async UniTask CloseAll() {
 			await SetCurrent(null);
@@ -51,6 +69,10 @@ namespace Nox.Sessions.Runtime {
 			foreach (var register in _registers.ToArray())
 				Unregister(register);
 			_registers.Clear();
+
+			foreach (var handler in _handlers.ToArray())
+				SettingAPI.Remove(handler.GetPath());
+			_handlers = Array.Empty<IHandler>();
 
 			Instance = null;
 			CoreAPI = null;

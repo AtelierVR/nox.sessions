@@ -19,3 +19,13 @@ MonoBehaviour:
       value: "About the session"
     - key: sessions.page.session.select_title
       value: "Select a session"
+    - key: settings.page.sessions.title
+      value: "Session Settings"
+    - key: settings.page.sessions.label
+      value: "Sessions"
+    - key: settings.group.sessions.visual.label
+      value: "Visual"
+    - key: settings.entry.sessions.visual.render_entity.label
+      value: "Max Entity Distance"
+    - key: settings.entry.sessions.visual.clear_physical.label
+      value: "Clear Physical"

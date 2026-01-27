@@ -39,6 +39,16 @@
     {
       "id": "entity",
       "type": "depends"
+    },
+    {
+      "id": "settings",
+      "type": "depends"
+    }
+  ],
+  "constraints": [
+    {
+      "type": "after",
+      "id": "settings"
     }
   ],
   "entrypoints": {
