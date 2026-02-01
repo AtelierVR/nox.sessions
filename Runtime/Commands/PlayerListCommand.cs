@@ -4,7 +4,7 @@ using Cysharp.Threading.Tasks;
 using Nox.CCK.Language;
 using Nox.Players;
 using Nox.Sessions.Runtime;
-using Nox.Terminals;
+using Nox.Terminal;
 
 namespace Nox.Session.Runtime.Commands {
 	public class PlayerListCommand : ICommand, IHelper {

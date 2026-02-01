@@ -11,7 +11,8 @@
         "Nox.CCK.Sessions",
         "Nox.Settings",
         "Nox.UI",
-        "Nox.CCK.Settings"
+        "Nox.CCK.Settings",
+        "Nox.Terminal"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

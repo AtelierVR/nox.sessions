@@ -1,6 +1,6 @@
 using System;
 using Nox.Sessions.Runtime;
-using Nox.Terminals;
+using Nox.Terminal;
 
 namespace Nox.Session.Runtime.Commands {
 	public class Commands : IDisposable {
