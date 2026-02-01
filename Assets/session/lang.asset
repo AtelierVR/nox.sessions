@@ -29,3 +29,27 @@ MonoBehaviour:
       value: "Max Entity Distance"
     - key: settings.entry.sessions.visual.clear_physical.label
       value: "Clear Physical"
+    - key: terminal.command.respawn.short
+      value: Respawn the local player
+    - key: terminal.command.players.short
+      value: List all players in the session
+    - key: terminal.command.respawn.description
+      value: Respawn the local player at their spawn point. This will teleport the player to their designated respawn location.
+    - key: terminal.command.players.description
+      value: Display a list of all players currently in the session, including their positions and status (local/master...).
+    - key: terminal.command.respawn.player_not_found
+      value: "Local player not found."
+    - key: terminal.command.respawn.success
+      value: "Player '{0}' respawned to ({1:F2}, {2:F2}, {3:F2})."
+    - key: terminal.command.players.session_not_found
+      value: "No active session found."
+    - key: terminal.command.players.no_players
+      value: "No players in the session."
+    - key: terminal.command.players.header
+      value: "{0} player(s) in the session:"
+    - key: terminal.command.players.local
+      value: "[LOCAL]"
+    - key: terminal.command.players.master
+      value: "[MASTER]"
+    - key: terminal.command.players.entry
+      value: " {0}. {1} - ({2:F2}, {3:F2}, {4:F2}) {5}"
