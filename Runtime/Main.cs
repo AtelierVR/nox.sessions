@@ -6,6 +6,7 @@ using Nox.CCK.Language;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
 using Nox.CCK.Sessions;
+using Nox.Session.Runtime.Commands;
 using Nox.Sessions.Runtime.Settings;
 using Nox.Settings;
 using UnityEngine.Events;
@@ -32,6 +33,7 @@ namespace Nox.Sessions.Runtime {
 		private LanguagePack _lang;
 		private readonly HashSet<ISession> _sessions = new();
 		private IHandler[] _handlers = Array.Empty<IHandler>();
+		private Commands commands;
 
 
 		public void OnInitializeMain(IMainModCoreAPI api) {
@@ -45,6 +47,7 @@ namespace Nox.Sessions.Runtime {
 			};;
 			foreach (var handler in _handlers)
 				SettingAPI.Add(handler);
+			commands = new Commands();
 		}
 
 		public void OnUpdateMain()
@@ -64,6 +67,9 @@ namespace Nox.Sessions.Runtime {
 		}
 
 		public async UniTask OnDisposeMainAsync() {
+			commands?.Dispose();
+			commands = null;
+			
 			await CloseAll();
 
 			foreach (var register in _registers.ToArray())
