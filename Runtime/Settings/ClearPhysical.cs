@@ -14,7 +14,7 @@ namespace Nox.Sessions.Runtime.Settings {
 		public ClearPhysical() {
 			SetRange(0f, 30f);
 			SetStep(1f);
-			SetValue(CCK.Sessions.Settings.ClearPhysicalAfterSeconds, false);
+			SetValue(CCK.Sessions.Settings.ClearPhysicalAfterSeconds);
 			SetLabelKey($"settings.entry.{string.Join(".", GetPath())}.label");
 			SetValueKey("settings.range.value.seconds");
 		}

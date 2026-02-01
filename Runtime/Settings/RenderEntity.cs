@@ -12,8 +12,8 @@ namespace Nox.Sessions.Runtime.Settings {
 
 		public RenderEntity() {
 			SetRange(5f, 200f);
-			SetStep(1f);
-			SetValue(CCK.Sessions.Settings.RenderEntityDistance, false);
+			SetStep(.1f);
+			SetValue(CCK.Sessions.Settings.RenderEntityDistance);
 			SetLabelKey($"settings.entry.{string.Join(".", GetPath())}.label");
 			SetValueKey("settings.range.value.meters");
 		}
