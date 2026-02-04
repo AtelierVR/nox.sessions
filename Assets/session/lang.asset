@@ -53,3 +53,53 @@ MonoBehaviour:
       value: "[MASTER]"
     - key: terminal.command.players.entry
       value: " {0}. {1} - ({2:F2}, {3:F2}, {4:F2}) {5}"
+    - key: terminal.command.sessions.short
+      value: Manage sessions
+    - key: terminal.command.sessions.description
+      value: Manage sessions - list all sessions, change to a different session, or leave a session.
+    - key: terminal.command.sessions.no_sessions
+      value: "No sessions available."
+    - key: terminal.command.sessions.header
+      value: "{0} session(s) available:"
+    - key: terminal.command.sessions.current
+      value: "[CURRENT]"
+    - key: terminal.command.sessions.entry
+      value: " {0}. {1} - {2} {3}"
+    - key: terminal.command.sessions.unknown_subcommand
+      value: "Unknown subcommand: '{0}'"
+    - key: terminal.command.sessions.change.missing_id
+      value: "Missing session ID. Usage: sessions change <id>"
+    - key: terminal.command.sessions.change.usage
+      value: "Usage: {0} change <id>"
+    - key: terminal.command.sessions.change.not_found
+      value: "Session '{0}' not found."
+    - key: terminal.command.sessions.change.already_current
+      value: "Already in session '{0}'."
+    - key: terminal.command.sessions.change.success
+      value: "Successfully changed to session '{0}'."
+    - key: terminal.command.sessions.change.error
+      value: "Error changing session: {0}"
+    - key: terminal.command.sessions.leave.no_current
+      value: "No active session to leave."
+    - key: terminal.command.sessions.leave.not_found
+      value: "Session '{0}' not found."
+    - key: terminal.command.sessions.leave.success
+      value: "Successfully left session '{0}'."
+    - key: terminal.command.sessions.leave.error
+      value: "Error leaving session: {0}"
+    - key: terminal.command.sessions.status.pending
+      value: "Pending"
+    - key: terminal.command.sessions.status.ready
+      value: "Ready"
+    - key: terminal.command.sessions.status.error
+      value: "Error"
+    - key: terminal.command.sessions.status.finished
+      value: "Finished"
+    - key: terminal.command.sessions.entry_net
+      value: " {0}. {1} - {2} - {3} {4} {5}"
+    - key: terminal.command.sessions.net.connected
+      value: "Connected"
+    - key: terminal.command.sessions.net.disconnected
+      value: "Disconnected"
+    - key: terminal.command.sessions.net.ping
+      value: "{0:F0}ms"

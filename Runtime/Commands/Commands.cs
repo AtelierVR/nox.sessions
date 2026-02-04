@@ -10,8 +10,9 @@ namespace Nox.Session.Runtime.Commands {
 				.GetInstance<ITerminalAPI>();
 
 		private readonly (uint, ICommand)[] _list = {
-			(0, new RespawnCommand()),
-			(0, new PlayerListCommand())
+			(0, new Respawn()),
+			(0, new PlayerList()),
+			(0, new Sessions())
 		};
 
 		public Commands() {

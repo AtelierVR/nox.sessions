@@ -7,7 +7,7 @@ using Nox.Sessions.Runtime;
 using Nox.Terminal;
 
 namespace Nox.Session.Runtime.Commands {
-	public class PlayerListCommand : ICommand, IHelper {
+	public class PlayerList : ICommand, IHelper {
 		public string GetName()
 			=> "players";
 

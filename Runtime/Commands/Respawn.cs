@@ -5,7 +5,7 @@ using Nox.Sessions.Runtime;
 using Nox.Terminal;
 
 namespace Nox.Session.Runtime.Commands {
-	public class RespawnCommand : ICommand, IHelper {
+	public class Respawn : ICommand, IHelper {
 		public string GetName()
 			=> "respawn";
 
