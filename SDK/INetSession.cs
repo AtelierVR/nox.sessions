@@ -33,6 +33,12 @@ namespace Nox.Sessions {
 		public UnityEvent<string> OnDisconnected { get; }
 		
 		/// <summary>
+		/// Invoked when the ping value changes significantly.
+		/// Provides the new ping value in milliseconds.
+		/// </summary>
+		public UnityEvent<double> OnPingChanged { get; }
+		
+		/// <summary>
 		/// Emits a custom event to the session.
 		/// Is emitting from local player.
 		/// </summary>

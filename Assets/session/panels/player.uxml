@@ -1,0 +1,52 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/nox.cck/Resources/nox.style.uss?fileID=7433441132597879392&amp;guid=956d93e835714844b98277f4fdbd77d3&amp;type=3#nox.style" />
+    <ui:VisualElement style="flex-grow: 1;">
+        <ui:GroupBox class="m-0 p-8 border-b">
+            <ui:VisualElement style="flex-direction: row; align-items: center;">
+                <ui:Button text="← Back" name="back" class="large" style="margin-right: 8px;" />
+                <ui:Label name="title" text="Player Details" class="text-lg" style="flex-grow: 1;" />
+            </ui:VisualElement>
+        </ui:GroupBox>
+        <ui:ScrollView style="flex-grow: 1;">
+            <!-- Player Info -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Player Information" class="text-lg mb-8" />
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="ID" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="player-id" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Display Name" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="player-display" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Is Local" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="player-local" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Is Master" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="player-master" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+            
+            <!-- Avatar Info -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Avatar" class="text-lg mb-8" />
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Identifier" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="avatar-id" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+            
+            <!-- Properties -->
+            <ui:GroupBox class="p-8 m-0">
+                <ui:Label text="Properties" class="text-lg mb-8" />
+                <ui:VisualElement name="properties-list" style="flex-grow: 1;" />
+                <ui:VisualElement name="properties-empty" style="display: none;">
+                    <ui:Label text="No properties" class="text-center" style="opacity: 0.7;" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>
+

@@ -1,0 +1,27 @@
+{
+  "name": "Nox.Sessions.Editor",
+  "rootNamespace": "Nox.Sessions.Editor",
+  "references": [
+    "Nox.Mods.Sessions",
+    "Nox.CCK.Worlds",
+    "Nox.CCK.Avatars",
+    "Nox.CCK.Sessions",
+    "Nox.CCK.Players",
+    "Nox.CCK.Entities",
+    "Nox.CCK.Utils",
+    "Nox.CCK.Mods",
+    "api.nox.editor.panel"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
+

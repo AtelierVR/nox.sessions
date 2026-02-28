@@ -7,7 +7,9 @@
         "Nox.Players",
         "Nox.Entities",
         "Nox.CCK",
-        "Nox.Sessions"
+        "Nox.Sessions",
+        "Nox.Editor.Panel",
+        "Nox.Avatars"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

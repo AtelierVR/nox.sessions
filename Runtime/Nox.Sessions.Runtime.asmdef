@@ -12,7 +12,10 @@
         "Nox.Settings",
         "Nox.UI",
         "Nox.CCK.Settings",
-        "Nox.Terminal"
+        "Nox.Terminal",
+        "Nox.Editor.Panel",
+        "Nox.Avatars",
+        "Nox.Worlds"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

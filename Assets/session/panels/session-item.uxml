@@ -1,0 +1,12 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/nox.cck/Resources/nox.style.uss?fileID=7433441132597879392&amp;guid=956d93e835714844b98277f4fdbd77d3&amp;type=3#nox.style" />
+    <ui:VisualElement style="flex-grow: 1; padding-top: 4px; padding-bottom: 4px; flex-direction: row; border-bottom-width: 1px; border-color: rgb(47, 47, 47);">
+        <ui:VisualElement style="flex-grow: 1; padding-left: 8px; padding-right: 8px;">
+            <ui:Label name="title" text="Session" class="text-lg" />
+            <ui:Label name="state" text="State: Unknown" style="opacity: 0.7;" />
+            <ui:Label name="connection" text="Disconnected" style="opacity: 0.7;" />
+        </ui:VisualElement>
+        <ui:Button name="view" text="View Details" class="large" style="align-self: center; margin-right: 8px;" />
+    </ui:VisualElement>
+</ui:UXML>
+

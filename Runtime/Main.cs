@@ -11,6 +11,10 @@ using Nox.Sessions.Runtime.Settings;
 using Nox.Settings;
 using UnityEngine.Events;
 
+#if UNITY_EDITOR
+using Nox.Editor.Panel;
+#endif
+
 namespace Nox.Sessions.Runtime {
 	public class Main : IMainModInitializer, ISessionAPI {
 		public static IMainModCoreAPI CoreAPI { get; private set; }
@@ -21,6 +25,13 @@ namespace Nox.Sessions.Runtime {
 			=> CoreAPI?.ModAPI
 				?.GetMod("settings")
 				?.GetInstance<ISettingAPI>();
+
+		#if UNITY_EDITOR
+		static internal IPanelAPI PanelAPI
+			=> CoreAPI?.ModAPI
+				?.GetMod("editor.panel")
+				?.GetInstance<IPanelAPI>();
+		#endif
 
 		internal ISession GetCurrentSession() {
 			if (Current == null)
@@ -37,14 +48,15 @@ namespace Nox.Sessions.Runtime {
 
 
 		public void OnInitializeMain(IMainModCoreAPI api) {
-			CoreAPI = api;
+			CoreAPI  = api;
 			Instance = this;
-			_lang = api.AssetAPI.GetAsset<LanguagePack>("lang.asset");
+			_lang    = api.AssetAPI.GetAsset<LanguagePack>("lang.asset");
 			LanguageManager.AddPack(_lang);
 			_handlers = new IHandler[] {
 				new RenderEntity(),
 				new ClearPhysical()
-			};;
+			};
+			;
 			foreach (var handler in _handlers)
 				SettingAPI.Add(handler);
 			commands = new Commands();
@@ -69,7 +81,7 @@ namespace Nox.Sessions.Runtime {
 		public async UniTask OnDisposeMainAsync() {
 			commands?.Dispose();
 			commands = null;
-			
+
 			await CloseAll();
 
 			foreach (var register in _registers.ToArray())
@@ -81,7 +93,7 @@ namespace Nox.Sessions.Runtime {
 			_handlers = Array.Empty<IHandler>();
 
 			Instance = null;
-			CoreAPI = null;
+			CoreAPI  = null;
 		}
 
 		#if UNITY_EDITOR
@@ -95,14 +107,16 @@ namespace Nox.Sessions.Runtime {
 		#endif
 
 		public void Add(ISession session) {
-			if (Has(session.Id)) return;
+			if (Has(session.Id))
+				return;
 			_sessions.Add(session);
 			OnSessionAdded.Invoke(session);
 			CoreAPI.EventAPI.Emit("session_added", session);
 		}
 
 		public void Remove(ISession session) {
-			if (!Has(session.Id)) return;
+			if (!Has(session.Id))
+				return;
 
 			// If the session being unregistered is the current one,
 			// switch to another session if available, or set to null.
@@ -110,8 +124,8 @@ namespace Nox.Sessions.Runtime {
 				if (_sessions.Count > 1) {
 					var otherSession = _sessions.First(s => s.Id != session.Id);
 					SetCurrent(otherSession.Id).Forget();
-				}
-				else SetCurrent(null).Forget();
+				} else
+					SetCurrent(null).Forget();
 			}
 
 			_sessions.Remove(session);
@@ -171,13 +185,15 @@ namespace Nox.Sessions.Runtime {
 		private readonly HashSet<ISessionRegister> _registers = new();
 
 		public void Register(ISessionRegister register) {
-			if (!_registers.Add(register)) return;
+			if (!_registers.Add(register))
+				return;
 			OnSessionRegisterAdded.Invoke(register);
 			CoreAPI.EventAPI.Emit("session_register_added", register);
 		}
 
 		public void Unregister(ISessionRegister register) {
-			if (!_registers.Remove(register)) return;
+			if (!_registers.Remove(register))
+				return;
 			OnSessionRegisterRemoved.Invoke(register);
 			CoreAPI.EventAPI.Emit("session_register_removed", register);
 		}
@@ -186,7 +202,8 @@ namespace Nox.Sessions.Runtime {
 			session = null;
 
 			foreach (var register in _registers) {
-				if (!register.TryMakeSession(name, options, out session)) continue;
+				if (!register.TryMakeSession(name, options, out session))
+					continue;
 				CoreAPI.EventAPI.Emit("session_created", session);
 				Add(session);
 				return true;

@@ -59,6 +59,11 @@
     "main": [
       "Nox.Sessions.Runtime.Main"
     ],
+    "editor": [
+      "Nox.Sessions.Runtime.Editor.SessionsPanel",
+      "Nox.Sessions.Runtime.Editor.SessionDetailsPanel",
+      "Nox.Sessions.Runtime.Editor.PlayerPanel"
+    ],
     "client": [
       "Nox.Sessions.Clients.Client"
     ]
