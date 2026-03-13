@@ -8,7 +8,7 @@ namespace Nox.Sessions.Runtime.Settings {
 		public override string[] GetPath()
 			=> new[] { "sessions", "visual", "clear_physical" };
 
-		public override GameObject GetPrefab()
+		override protected GameObject GetPrefab()
 			=> Main.CoreAPI.AssetAPI.GetAsset<GameObject>("settings:prefabs/range.prefab");
 
 		public ClearPhysical() {
@@ -19,7 +19,7 @@ namespace Nox.Sessions.Runtime.Settings {
 			SetValueKey("settings.range.value.seconds");
 		}
 
-		public override void OnValueChanged(float value)
+		override protected void OnValueChanged(float value)
 			=> CCK.Sessions.Settings.ClearPhysicalAfterSeconds = value.ToInt();
 	}
 }

@@ -7,7 +7,7 @@ namespace Nox.Sessions.Runtime.Settings {
 		public override string[] GetPath()
 			=> new[] { "sessions", "visual", "render_entity" };
 
-		public override GameObject GetPrefab()
+		override protected GameObject GetPrefab()
 			=> Main.CoreAPI.AssetAPI.GetAsset<GameObject>("settings:prefabs/range.prefab");
 
 		public RenderEntity() {
@@ -18,7 +18,7 @@ namespace Nox.Sessions.Runtime.Settings {
 			SetValueKey("settings.range.value.meters");
 		}
 
-		public override void OnValueChanged(float value)
+		override protected void OnValueChanged(float value)
 			=> CCK.Sessions.Settings.RenderEntityDistance = value;
 	}
 }
