@@ -24,9 +24,9 @@ namespace Nox.Sessions.Clients.Pages {
 		public static IPage Create(IMenu menu, object[] context) {
 			var sessionId = TryGet(context, 0, out string id) ? id : null;
 			return new SessionPage {
-				_menuId = menu.GetId(),
+				_menuId  = menu.Id,
 				_context = context,
-				_crtId = sessionId
+				_crtId   = sessionId
 			};
 		}
 
