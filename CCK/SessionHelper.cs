@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Nox.CCK.Properties;
+using Nox.CCK.Utils;
 using Nox.Instances;
 using Nox.Sessions;
 using Nox.Worlds;
@@ -19,7 +20,8 @@ namespace Nox.CCK.Sessions {
 			=> session.TryGetProperty<bool>(PropertyHelper.StringToKey(DISPOSE_ON_CHANGE), out var value) && value;
 
 		public static void SetDisposeOnChange(this ISession session, bool value) {
-			if (session is not IEditablePropertyObject epo) return;
+			if (session is not IEditablePropertyObject epo)
+				return;
 			epo.SetProperty(PropertyHelper.StringToKey(DISPOSE_ON_CHANGE), value);
 		}
 
@@ -34,7 +36,8 @@ namespace Nox.CCK.Sessions {
 		}
 
 		public static void SetTitle(this ISession session, string title) {
-			if (session is not IEditablePropertyObject epo) return;
+			if (session is not IEditablePropertyObject epo)
+				return;
 			epo.SetProperty(PropertyHelper.StringToKey(TITLE), title);
 		}
 
@@ -50,15 +53,16 @@ namespace Nox.CCK.Sessions {
 		}
 
 		public static void SetThumbnail(this ISession session, Texture2D thumbnail) {
-			if (session is not IEditablePropertyObject epo) return;
+			if (session is not IEditablePropertyObject epo)
+				return;
 			epo.SetProperty(PropertyHelper.StringToKey(THUMBNAIL), thumbnail);
 		}
 
 		public static bool IsCurrent(ISessionAPI api, ISession session)
 			=> api.Current == session.Id;
 
-		public static bool Match(this ISession session, IWorldIdentifier world)
-			=> session.Dimensions.Identifier?.Equals(world) ?? false;
+		public static bool Match(this ISession session, Identifier world)
+			=> session.Dimensions.Identifier.Equals(world);
 
 		public static IInstanceIdentifier GetInstance(this ISession session) {
 			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(INSTANCE), out var value))
@@ -71,22 +75,24 @@ namespace Nox.CCK.Sessions {
 		}
 
 		public static void SetInstance(this ISession session, IInstanceIdentifier instance) {
-			if (session is not IEditablePropertyObject epo) return;
+			if (session is not IEditablePropertyObject epo)
+				return;
 			epo.SetProperty(PropertyHelper.StringToKey(INSTANCE), instance);
 		}
 
-		public static IWorldIdentifier GetWorld(this ISession session) {
+		public static Identifier GetWorld(this ISession session) {
 			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(WORLD), out var value))
-				return null;
+				return Identifier.Invalid;
 			return value switch {
-				IWorldIdentifier identifier => identifier,
-				Func<IWorldIdentifier> func => func(),
-				_                           => null
+				Identifier identifier => identifier,
+				Func<Identifier> func => func(),
+				_                     => Identifier.Invalid
 			};
 		}
 
-		public static void SetWorld(this ISession session, IWorldIdentifier world) {
-			if (session is not IEditablePropertyObject epo) return;
+		public static void SetWorld(this ISession session, Identifier world) {
+			if (session is not IEditablePropertyObject epo)
+				return;
 			epo.SetProperty(PropertyHelper.StringToKey(WORLD), world);
 		}
 
@@ -101,7 +107,8 @@ namespace Nox.CCK.Sessions {
 		}
 
 		public static void SetShortName(this ISession session, string shortName) {
-			if (session is not IEditablePropertyObject epo) return;
+			if (session is not IEditablePropertyObject epo)
+				return;
 			epo.SetProperty(PropertyHelper.StringToKey(SHORT_NAME), shortName);
 		}
 
@@ -125,7 +132,8 @@ namespace Nox.CCK.Sessions {
 			return tcs.Task;
 
 			void Handler(IState state) {
-				if (!state.IsFinished()) return;
+				if (!state.IsFinished())
+					return;
 				session.OnStateChanged.RemoveListener(Handler);
 				tcs.TrySetResult(state.IsReady());
 			}

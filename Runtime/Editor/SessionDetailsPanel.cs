@@ -195,7 +195,7 @@ namespace Nox.Sessions.Runtime.Editor {
 				_sessionPing.text = "N/A";
 			}
 
-			_worldId.text = _session.Dimensions?.Identifier?.ToString() ?? "No world loaded";
+			_worldId.text = _session.Dimensions?.Identifier.ToString() ?? "No world loaded";
 
 			RefreshPlayers();
 		}

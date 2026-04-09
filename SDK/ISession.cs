@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Nox.CCK.Properties;
+using Nox.CCK.Utils;
 using Nox.Entities;
 using Nox.Players;
 using Nox.Worlds;
@@ -113,6 +114,6 @@ namespace Nox.Sessions {
 		/// </summary>
 		/// <param name="identifier"></param>
 		/// <returns></returns>
-		bool Match(IWorldIdentifier identifier);
+		bool Match(Identifier identifier);
 	}
 }

@@ -1,3 +1,4 @@
+using Nox.CCK.Utils;
 using Nox.Worlds;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,7 +8,7 @@ namespace Nox.Sessions {
 		/// <summary>
 		/// The world associated with this dimension.
 		/// </summary>
-		public IWorldIdentifier Identifier { get; }
+		public Identifier Identifier { get; }
 
 		/// <summary>
 		/// Indicates whether the scene is fully loaded

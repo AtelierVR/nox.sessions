@@ -48,10 +48,10 @@ namespace Nox.Sessions.Runtime.Editor {
 
 	internal struct PropertyRow {
 		public VisualElement Container;
-		public Label        ValueLabel;
-		public Label        FlagsLabel;
-		public DateTime     LastUpdatedAt;
-		public DateTime     ChangedAt;
+		public Label ValueLabel;
+		public Label FlagsLabel;
+		public DateTime LastUpdatedAt;
+		public DateTime ChangedAt;
 	}
 
 	public class PlayerInstance : IInstance {
@@ -81,9 +81,9 @@ namespace Nox.Sessions.Runtime.Editor {
 		private const int TickMs = 50;
 
 		public PlayerInstance(PlayerPanel panel, IWindow window, Dictionary<string, object> data) {
-			_panel = panel;
+			_panel  = panel;
 			_window = window;
-			
+
 			if (data != null) {
 				if (data.TryGetValue("session", out var sessionObj))
 					_session = sessionObj as ISession;
@@ -116,14 +116,14 @@ namespace Nox.Sessions.Runtime.Editor {
 				.GetAsset<VisualTreeAsset>("panels/player.uxml")
 				.CloneTree();
 
-			_back = root.Q<Button>("back");
-			_title = root.Q<Label>("title");
-			_playerId = root.Q<Label>("player-id");
-			_playerDisplay = root.Q<Label>("player-display");
-			_playerLocal = root.Q<Label>("player-local");
-			_playerMaster = root.Q<Label>("player-master");
-			_avatarId = root.Q<Label>("avatar-id");
-			_propertiesList = root.Q<VisualElement>("properties-list");
+			_back            = root.Q<Button>("back");
+			_title           = root.Q<Label>("title");
+			_playerId        = root.Q<Label>("player-id");
+			_playerDisplay   = root.Q<Label>("player-display");
+			_playerLocal     = root.Q<Label>("player-local");
+			_playerMaster    = root.Q<Label>("player-master");
+			_avatarId        = root.Q<Label>("avatar-id");
+			_propertiesList  = root.Q<VisualElement>("properties-list");
 			_propertiesEmpty = root.Q<VisualElement>("properties-empty");
 
 			_back.RegisterCallback<ClickEvent>(OnBackClicked);
@@ -141,7 +141,8 @@ namespace Nox.Sessions.Runtime.Editor {
 		//  Scheduler 
 
 		private void OnTick() {
-			if (_player is not IEntity entity) return;
+			if (_player is not IEntity entity)
+				return;
 
 			var properties = entity.GetProperties();
 
@@ -154,14 +155,15 @@ namespace Nox.Sessions.Runtime.Editor {
 			var now = DateTime.UtcNow;
 
 			foreach (var property in properties) {
-				if (!_rows.TryGetValue(property.Key, out var row)) continue;
+				if (!_rows.TryGetValue(property.Key, out var row))
+					continue;
 
 				// Detect change by UpdatedAt
 				if (property.UpdatedAt != row.LastUpdatedAt) {
 					row.ValueLabel.text = property.Value?.ToString() ?? "null";
 					row.FlagsLabel.text = $"Flags: {property.Flags}";
-					row.ChangedAt      = now;
-					row.LastUpdatedAt  = property.UpdatedAt;
+					row.ChangedAt       = now;
+					row.LastUpdatedAt   = property.UpdatedAt;
 					_rows[property.Key] = row;
 				}
 
@@ -181,7 +183,7 @@ namespace Nox.Sessions.Runtime.Editor {
 			}
 
 			var data = new Dictionary<string, object> { { "session", _session } };
-			
+
 			if (!Main.PanelAPI.TryGetPanel(new ResourceIdentifier(null, new[] { "session", "details" }), out var panel)) {
 				Logger.LogError("SessionDetailsPanel not found");
 				return;
@@ -198,19 +200,18 @@ namespace Nox.Sessions.Runtime.Editor {
 				return;
 			}
 
-			_title.text = $"Player: {_player.Display}";
-			_playerId.text = _player.Id.ToString();
+			_title.text         = $"Player: {_player.Display}";
+			_playerId.text      = _player.Id.ToString();
 			_playerDisplay.text = _player.Display;
-			_playerLocal.text = _player.IsLocal ? "Yes" : "No";
-			_playerMaster.text = _player.IsMaster ? "Yes" : "No";
+			_playerLocal.text   = _player.IsLocal ? "Yes" : "No";
+			_playerMaster.text  = _player.IsMaster ? "Yes" : "No";
 
 			if (_player is IPlayerAvatar playerAvatar) {
 				var avatar = playerAvatar.GetAvatar();
-				_avatarId.text = avatar?.ToString() ?? "No avatar";
-			} else {
+				_avatarId.text = avatar.ToString();
+			} else
 				_avatarId.text = "N/A";
-			}
-
+			
 			LoadProperties();
 		}
 
@@ -240,7 +241,7 @@ namespace Nox.Sessions.Runtime.Editor {
 
 			foreach (var property in properties) {
 				var item       = itemAsset.CloneTree();
-				var container  = item.Q<VisualElement>();  // root element of the template
+				var container  = item.Q<VisualElement>(); // root element of the template
 				var valueLabel = item.Q<Label>("value");
 				var flagsLabel = item.Q<Label>("flags");
 
@@ -262,4 +263,3 @@ namespace Nox.Sessions.Runtime.Editor {
 	}
 }
 #endif
-
