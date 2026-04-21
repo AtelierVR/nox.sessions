@@ -64,17 +64,17 @@ namespace Nox.CCK.Sessions {
 		public static bool Match(this ISession session, Identifier world)
 			=> session.Dimensions.Identifier.Equals(world);
 
-		public static IInstanceIdentifier GetInstance(this ISession session) {
+		public static Identifier GetInstance(this ISession session) {
 			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(INSTANCE), out var value))
-				return null;
+				return Identifier.Invalid;
 			return value switch {
-				IInstanceIdentifier identifier => identifier,
-				Func<IInstanceIdentifier> func => func(),
-				_                              => null
+				Identifier identifier => identifier,
+				Func<Identifier> func => func(),
+				_                     => Identifier.Invalid
 			};
 		}
 
-		public static void SetInstance(this ISession session, IInstanceIdentifier instance) {
+		public static void SetInstance(this ISession session, Identifier instance) {
 			if (session is not IEditablePropertyObject epo)
 				return;
 			epo.SetProperty(PropertyHelper.StringToKey(INSTANCE), instance);
