@@ -58,7 +58,7 @@ namespace Nox.Sessions.Clients.Components {
 			var content = Instantiate(Client.API.AssetAPI.GetAsset<GameObject>("ui:prefabs/split.prefab"), parent);
 			var component = content.AddComponent<SessionComponent>();
 			component.Page = page;
-			content.name = $"[{page.GetKey()}_{content.GetInstanceID()}]";
+			content.name = $"[{page.GetKey()}_{content.GetEntityId().GetHashCode()}]";
 
 			var splitContent = Reference.GetComponent<RectTransform>("content", content);
 
