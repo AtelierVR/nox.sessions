@@ -43,6 +43,10 @@
     {
       "id": "settings",
       "type": "depends"
+    },
+    {
+      "id": "servers",
+      "type": "recommends"
     }
   ],
   "constraints": [

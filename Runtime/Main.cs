@@ -21,6 +21,8 @@ namespace Nox.Sessions.Runtime {
 
 		public static Main Instance { get; private set; }
 
+		private Socket _socket;
+
 		static internal ISettingAPI SettingAPI
 			=> CoreAPI?.ModAPI
 				?.GetMod("settings")
@@ -60,6 +62,8 @@ namespace Nox.Sessions.Runtime {
 			foreach (var handler in _handlers)
 				SettingAPI.Add(handler);
 			commands = new Commands();
+			_socket = new Socket();
+			_socket.Initialize();
 		}
 
 		public void OnUpdateMain()
@@ -81,6 +85,9 @@ namespace Nox.Sessions.Runtime {
 		public async UniTask OnDisposeMainAsync() {
 			commands?.Dispose();
 			commands = null;
+
+			_socket?.Dispose();
+			_socket = null;
 
 			await CloseAll();
 

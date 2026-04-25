@@ -15,7 +15,8 @@
         "Nox.Terminal",
         "Nox.Editor.Panel",
         "Nox.Avatars",
-        "Nox.Worlds"
+        "Nox.Worlds",
+        "Nox.Servers"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
