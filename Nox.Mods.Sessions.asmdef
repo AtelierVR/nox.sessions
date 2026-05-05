@@ -9,7 +9,9 @@
         "Nox.CCK",
         "Nox.Sessions",
         "Nox.Editor.Panel",
-        "Nox.Avatars"
+        "Nox.Avatars",
+        "Nox.Scripting",
+        "Nox.CCK.Scripting"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

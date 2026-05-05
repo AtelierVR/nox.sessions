@@ -6,7 +6,10 @@ using Nox.CCK.Language;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
 using Nox.CCK.Sessions;
+using Nox.CCK.Scripting;
+using Nox.Scripting;
 using Nox.Session.Runtime.Commands;
+using Nox.Sessions.Runtime.Modules;
 using Nox.Sessions.Runtime.Settings;
 using Nox.Settings;
 using UnityEngine.Events;
@@ -64,6 +67,12 @@ namespace Nox.Sessions.Runtime {
 			commands = new Commands();
 			_socket = new Socket();
 			_socket.Initialize();
+
+			var scripting = api.ModAPI.GetMod("scripting")?.GetInstance<IScriptingAPI>();
+			if (scripting != null) {
+				scripting.RegisterModule(PlayersModule.Module);
+				scripting.RegisterModule(NetworkModule.Module);
+			}
 		}
 
 		public void OnUpdateMain()
@@ -98,6 +107,10 @@ namespace Nox.Sessions.Runtime {
 			foreach (var handler in _handlers.ToArray())
 				SettingAPI.Remove(handler.GetPath());
 			_handlers = Array.Empty<IHandler>();
+
+			var scripting = CoreAPI?.ModAPI.GetMod("scripting")?.GetInstance<IScriptingAPI>();
+			scripting?.UnregisterModule(new NameResolver("players"));
+			scripting?.UnregisterModule(new NameResolver("network"));
 
 			Instance = null;
 			CoreAPI  = null;
