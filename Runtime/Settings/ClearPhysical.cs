@@ -1,3 +1,4 @@
+using Nox.CCK;
 using Nox.CCK.Network;
 using Nox.CCK.Settings;
 using Nox.CCK.Utils;
