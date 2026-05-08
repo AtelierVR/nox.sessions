@@ -23,6 +23,22 @@ namespace Nox.Sessions {
 		public double Ping { get; }
 
 		/// <summary>
+		/// Maximum allowed payload size in bytes for <see cref="EmitEvent"/>.
+		/// </summary>
+		public int EventPayloadSize { get; }
+
+		/// <summary>
+		/// Current tick rate (ticks per second) of the session, as reported by the server.
+		/// </summary>
+		public int TickRate { get; }
+
+		/// <summary>
+		/// Invoked when the server-side tick rate changes.
+		/// Provides the new tick rate value.
+		/// </summary>
+		public UnityEvent<int> OnTickRateChanged { get; }
+
+		/// <summary>
 		/// Invoked when the session successfully connects to the network.
 		/// </summary>
 		public UnityEvent OnConnected { get; }

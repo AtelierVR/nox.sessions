@@ -85,5 +85,17 @@ namespace Nox.Sessions {
 		/// <param name="payload"></param>
 		/// <param name="sender"></param>
 		public void OnEvent(long name, byte[] payload, IPlayer sender) { }
+
+		/// <summary>
+		/// Invoked on each server tick.
+		/// <para><paramref name="tick"/> is the monotonically-increasing tick counter.</para>
+		/// </summary>
+		public void OnTick(long tick) { }
+
+		/// <summary>
+		/// Invoked when the session tick rate changes.
+		/// <para><paramref name="tickRate"/> is the new tick rate in ticks per second.</para>
+		/// </summary>
+		public void OnTickRateChanged(int tickRate) { }
 	}
 }

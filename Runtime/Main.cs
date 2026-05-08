@@ -9,6 +9,7 @@ using Nox.CCK.Sessions;
 using Nox.CCK.Scripting;
 using Nox.Scripting;
 using Nox.Session.Runtime.Commands;
+using Nox.Sessions.Runtime.Converters;
 using Nox.Sessions.Runtime.Modules;
 using Nox.Sessions.Runtime.Settings;
 using Nox.Settings;
@@ -70,8 +71,10 @@ namespace Nox.Sessions.Runtime {
 
 			var scripting = api.ModAPI.GetMod("scripting")?.GetInstance<IScriptingAPI>();
 			if (scripting != null) {
+				scripting.RegisterConverter(PlayerConverter.Player);
 				scripting.RegisterModule(PlayersModule.Module);
 				scripting.RegisterModule(NetworkModule.Module);
+				scripting.RegisterModule(GizmoModule.Module);
 			}
 		}
 
@@ -109,8 +112,10 @@ namespace Nox.Sessions.Runtime {
 			_handlers = Array.Empty<IHandler>();
 
 			var scripting = CoreAPI?.ModAPI.GetMod("scripting")?.GetInstance<IScriptingAPI>();
-			scripting?.UnregisterModule(new NameResolver("players"));
-			scripting?.UnregisterModule(new NameResolver("network"));
+			scripting?.UnregisterConverter(PlayerConverter.Player);
+			scripting?.UnregisterModule(PlayersModule.Module);
+			scripting?.UnregisterModule(NetworkModule.Module);
+			scripting?.UnregisterModule(GizmoModule.Module);
 
 			Instance = null;
 			CoreAPI  = null;
