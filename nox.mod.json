@@ -51,6 +51,10 @@
     {
       "id": "server",
       "type": "depends"
+    },
+    {
+      "id": "scripting",
+      "type": "depends"
     }
   ],
   "constraints": [

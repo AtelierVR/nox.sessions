@@ -10,7 +10,7 @@
     "Nox.CCK.Entities",
     "Nox.CCK.Utils",
     "Nox.CCK.Mods",
-    "api.nox.editor.panel"
+    "Nox.Editor.Panel"
   ],
   "includePlatforms": [
     "Editor"
