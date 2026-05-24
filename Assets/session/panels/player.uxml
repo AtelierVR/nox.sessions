@@ -38,6 +38,15 @@
                 </ui:VisualElement>
             </ui:GroupBox>
             
+            <!-- Parts -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Parts" class="text-lg mb-8" />
+                <ui:VisualElement name="parts-list" style="flex-grow: 1;" />
+                <ui:VisualElement name="parts-empty" style="display: none;">
+                    <ui:Label text="No parts" class="text-center" style="opacity: 0.7;" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
             <!-- Properties -->
             <ui:GroupBox class="p-8 m-0">
                 <ui:Label text="Properties" class="text-lg mb-8" />
