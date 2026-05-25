@@ -1,5 +1,6 @@
 {
   "name": "nox.sessions",
   "displayName": "Nox - Sessions",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "description": "Session lifecycle management, joining, and player synchronization."
 }
