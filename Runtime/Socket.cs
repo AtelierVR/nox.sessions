@@ -42,7 +42,7 @@ namespace Nox.Sessions.Runtime
 
         private static IServerAPI ServerAPI
             => Main.CoreAPI?.ModAPI
-                ?.GetMod("server")
+                ?.GetMod("servers")
                 ?.GetInstance<IServerAPI>();
 
         // ── Event handlers ────────────────────────────────────────────────────────
