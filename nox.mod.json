@@ -26,35 +26,43 @@
   "relations": [
     {
       "id": "ui",
-      "type": "depends"
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.ui.git"
     },
     {
       "id": "terminal",
-      "type": "depends"
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.terminal.git"
     },
     {
       "id": "players",
-      "type": "depends"
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.players.git"
     },
     {
       "id": "entity",
-      "type": "depends"
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.entities.git"
     },
     {
       "id": "settings",
-      "type": "depends"
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.settings.git"
     },
     {
       "id": "servers",
-      "type": "recommends"
+      "type": "recommends",
+      "register": "git+https://github.com/AtelierVR/nox.servers.git"
     },
     {
       "id": "servers",
-      "type": "depends"
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.servers.git"
     },
     {
       "id": "scripting",
-      "type": "depends"
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.scripting.git"
     }
   ],
   "constraints": [
