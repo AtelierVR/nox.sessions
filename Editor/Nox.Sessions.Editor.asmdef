@@ -5,12 +5,14 @@
     "Nox.Mods.Sessions",
     "Nox.CCK.Worlds",
     "Nox.CCK.Avatars",
+    "Nox.Avatars",
     "Nox.CCK.Sessions",
     "Nox.CCK.Players",
     "Nox.CCK.Entities",
     "Nox.CCK.Utils",
     "Nox.CCK.Mods",
-    "Nox.Editor.Panel"
+    "Nox.Editor.Panel",
+    "UnityEngine.UIElementsModule"
   ],
   "includePlatforms": [
     "Editor"

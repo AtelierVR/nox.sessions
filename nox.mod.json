@@ -40,6 +40,11 @@
       "register": "git+https://github.com/AtelierVR/nox.players.git"
     },
     {
+      "id": "avatars",
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.avatars.git"
+    },
+    {
       "id": "entity",
       "type": "depends",
       "register": "git+https://github.com/AtelierVR/nox.entities.git"
