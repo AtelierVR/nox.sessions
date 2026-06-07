@@ -68,6 +68,16 @@
       "id": "scripting",
       "type": "depends",
       "register": "git+https://github.com/AtelierVR/nox.scripting.git"
+    },
+    {
+      "id": "com.unity.modules.uielements",
+      "type": "depends",
+      "register": "upm+com.unity.modules.uielements@1.0.0"
+    },
+    {
+      "id": "com.unity.modules.ui",
+      "type": "depends",
+      "register": "upm+com.unity.modules.ui@1.0.0"
     }
   ],
   "constraints": [
