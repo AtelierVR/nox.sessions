@@ -11,8 +11,7 @@
     "Nox.CCK.Entities",
     "Nox.CCK.Utils",
     "Nox.CCK.Mods",
-    "Nox.Editor.Panel",
-    "UnityEngine.UIElementsModule"
+    "Nox.Editor.Panel"
   ],
   "includePlatforms": [
     "Editor"
