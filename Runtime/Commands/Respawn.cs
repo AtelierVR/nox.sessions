@@ -19,7 +19,7 @@ namespace Nox.Session.Runtime.Commands {
 			=> $"{CommandWithPrefix}";
 
 		private string CommandWithPrefix
-			=> $"{Commands.TerminalAPI.GetPrefix()}{GetName()}";
+			=> GetName();
 
 		public string[] AutoComplete(string input, IContext context = null)
 			=> CommandWithPrefix.StartsWith(input.ToLower())

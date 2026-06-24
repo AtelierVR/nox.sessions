@@ -23,7 +23,7 @@ namespace Nox.Session.Runtime.Commands {
 			=> $"{CommandWithPrefix} [list|change <id>|leave [id]]";
 
 		private string CommandWithPrefix
-			=> $"{Commands.TerminalAPI.GetPrefix()}{GetName()}";
+			=> GetName();
 
 		public string[] AutoComplete(string input, IContext context = null) {
 			var inputLower = input.ToLower();
