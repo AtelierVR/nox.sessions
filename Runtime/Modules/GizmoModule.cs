@@ -50,12 +50,12 @@ namespace Nox.Sessions.Runtime.Modules {
 				// ── Color ────────────────────────────────────────────────────
 				.AddVariable(
 					"color",
-					getter: ctx => (object)NoxGizmos.color,
+					getter: ctx => (object)NoxGizmos.Color,
 					setter: (ctx, val) => {
 						if (val is Color c)
-							NoxGizmos.color = c;
+							NoxGizmos.Color = c;
 						else if (val is object[] arr && arr.Length >= 3)
-							NoxGizmos.color = new Color(arr[0].ToFloat(), arr[1].ToFloat(), arr[2].ToFloat(),
+							NoxGizmos.Color = new Color(arr[0].ToFloat(), arr[1].ToFloat(), arr[2].ToFloat(),
 								arr.Length >= 4 ? arr[3].ToFloat() : 1f);
 					}
 				)

@@ -74,21 +74,20 @@ namespace Nox.Sessions.Runtime.Editor {
 			=> "Sessions";
 
 		public void OnDestroy() {
-			// Unsubscribe from events
-			var sessionAPI = _panel.API.ModAPI.GetMod("session")?.GetInstance<ISessionAPI>();
-			if (sessionAPI != null) {
-				sessionAPI.OnSessionAdded.RemoveListener(OnSessionAddedOrRemoved);
-				sessionAPI.OnSessionRemoved.RemoveListener(OnSessionAddedOrRemoved);
-			}
-			
-			_panel.Instance = null;
+		// Unsubscribe from session list events
+		var sessionAPI = _panel.API.ModAPI.GetMod("session")?.GetInstance<ISessionAPI>();
+		if (sessionAPI != null) {
+			sessionAPI.OnSessionAdded.RemoveListener(OnSessionAddedOrRemoved);
+			sessionAPI.OnSessionRemoved.RemoveListener(OnSessionAddedOrRemoved);
 		}
 		
-		private void OnSessionAddedOrRemoved(ISession session) {
-			// Refresh the list when a session is added or removed
-			RefreshSessions();
-		}
-
+		_panel.Instance = null;
+	}
+	
+	private void OnSessionAddedOrRemoved(ISession session) {
+		// Refresh the list when a session is added or removed
+		RefreshSessions();
+	}
 		public VisualElement GetContent() {
 			if (_content != null)
 				return _content;
@@ -134,8 +133,35 @@ namespace Nox.Sessions.Runtime.Editor {
 				item.Q<Label>("title").text = $"Session: {session.Id}";
 				item.Q<Label>("state").text = $"State: {session.State?.Status.ToString() ?? "Unknown"}";
 				
-				var netSession = session as INetSession;
-				item.Q<Label>("connection").text = netSession?.IsConnected == true ? "Connected" : "Disconnected";
+				if (session is INetSession netSession) {
+					item.Q<Label>("connection").text = netSession.IsConnected ? "Connected" : "Disconnected";
+
+					// Networking details: Ping, TickRate, Server Time, Payload Size
+					var netInfo = item.Q<VisualElement>("net-info");
+					if (netInfo != null) {
+						netInfo.style.display = DisplayStyle.Flex;
+						
+						var pingLabel = netInfo.Q<Label>("ping");
+						if (pingLabel != null)
+							pingLabel.text = netSession.IsConnected ? $"Ping: {netSession.Ping:F0} ms" : "Ping: N/A";
+						
+						var tickRateLabel = netInfo.Q<Label>("tickrate");
+						if (tickRateLabel != null)
+							tickRateLabel.text = netSession.IsConnected ? $"TickRate: {netSession.TickRate} t/s" : "TickRate: N/A";
+						
+						var timeLabel = netInfo.Q<Label>("time");
+						if (timeLabel != null)
+							timeLabel.text = netSession.IsConnected ? $"Server: {netSession.Time:HH:mm:ss}" : "Server: N/A";
+						
+						var payloadLabel = netInfo.Q<Label>("payload");
+						if (payloadLabel != null)
+							payloadLabel.text = netSession.IsConnected ? $"Payload: {netSession.EventPayloadSize} B" : "Payload: N/A";
+					}
+				} else {
+					item.Q<Label>("connection").text = "N/A";
+					var netInfo = item.Q<VisualElement>("net-info");
+					if (netInfo != null) netInfo.style.display = DisplayStyle.None;
+				}
 
 				var viewButton = item.Q<Button>("view");
 				viewButton.RegisterCallback<ClickEvent>(_ => OpenDetails(session));

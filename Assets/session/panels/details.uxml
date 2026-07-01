@@ -28,6 +28,18 @@
                     <ui:Label text="Ping" style="min-width: 120px; opacity: 0.7;" />
                     <ui:Label name="session-ping" text="-" style="flex-grow: 1;" />
                 </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Tick Rate" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="session-tickrate" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Server Time" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="session-time" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Payload Size" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="session-payload" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
             </ui:GroupBox>
             
             <!-- World Info -->

@@ -59,6 +59,9 @@ namespace Nox.Sessions.Runtime.Editor {
 		private Label _sessionState;
 		private Label _sessionConnected;
 		private Label _sessionPing;
+		private Label _sessionTickRate;
+		private Label _sessionTime;
+		private Label _sessionPayload;
 		private Label _worldId;
 		private VisualElement _playersList;
 		private VisualElement _playersEmpty;
@@ -80,6 +83,7 @@ namespace Nox.Sessions.Runtime.Editor {
 				netSession.OnConnected.AddListener(OnConnectionChanged);
 				netSession.OnDisconnected.AddListener(OnDisconnectionChanged);
 				netSession.OnPingChanged.AddListener(OnPingChanged);
+				netSession.OnTickRateChanged.AddListener(OnTickRateChanged);
 			}
 		}
 	}
@@ -104,6 +108,7 @@ namespace Nox.Sessions.Runtime.Editor {
 					netSession.OnConnected.RemoveListener(OnConnectionChanged);
 					netSession.OnDisconnected.RemoveListener(OnDisconnectionChanged);
 					netSession.OnPingChanged.RemoveListener(OnPingChanged);
+					netSession.OnTickRateChanged.RemoveListener(OnTickRateChanged);
 				}
 			}
 			
@@ -123,8 +128,16 @@ namespace Nox.Sessions.Runtime.Editor {
 		private void OnConnectionChanged() {
 			if (_sessionConnected != null)
 				_sessionConnected.text = "Yes";
-			if (_sessionPing != null && _session is INetSession netSession)
-				_sessionPing.text = $"{netSession.Ping:F0} ms";
+			if (_session is INetSession netSession) {
+				if (_sessionPing != null)
+					_sessionPing.text = $"{netSession.Ping:F0} ms";
+				if (_sessionTickRate != null)
+					_sessionTickRate.text = $"{netSession.TickRate} t/s";
+				if (_sessionTime != null)
+					_sessionTime.text = $"{netSession.Time:HH:mm:ss}";
+				if (_sessionPayload != null)
+					_sessionPayload.text = $"{netSession.EventPayloadSize} B";
+			}
 		}
 		
 		private void OnDisconnectionChanged(string reason) {
@@ -132,11 +145,22 @@ namespace Nox.Sessions.Runtime.Editor {
 				_sessionConnected.text = "No";
 			if (_sessionPing != null)
 				_sessionPing.text = "N/A";
+			if (_sessionTickRate != null)
+				_sessionTickRate.text = "N/A";
+			if (_sessionTime != null)
+				_sessionTime.text = "N/A";
+			if (_sessionPayload != null)
+				_sessionPayload.text = "N/A";
 		}
 		
 		private void OnPingChanged(double ping) {
 			if (_sessionPing != null)
 				_sessionPing.text = $"{ping:F0} ms";
+		}
+		
+		private void OnTickRateChanged(int tickRate) {
+			if (_sessionTickRate != null)
+				_sessionTickRate.text = $"{tickRate} t/s";
 		}
 
 		public VisualElement GetContent() {
@@ -154,6 +178,9 @@ namespace Nox.Sessions.Runtime.Editor {
 			_sessionState = root.Q<Label>("session-state");
 			_sessionConnected = root.Q<Label>("session-connected");
 			_sessionPing = root.Q<Label>("session-ping");
+			_sessionTickRate = root.Q<Label>("session-tickrate");
+			_sessionTime = root.Q<Label>("session-time");
+			_sessionPayload = root.Q<Label>("session-payload");
 			_worldId = root.Q<Label>("world-id");
 			_playersList = root.Q<VisualElement>("players-list");
 			_playersEmpty = root.Q<VisualElement>("players-empty");
@@ -190,9 +217,15 @@ namespace Nox.Sessions.Runtime.Editor {
 			if (_session is INetSession netSession) {
 				_sessionConnected.text = netSession.IsConnected ? "Yes" : "No";
 				_sessionPing.text = netSession.IsConnected ? $"{netSession.Ping:F0} ms" : "N/A";
+				_sessionTickRate.text = netSession.IsConnected ? $"{netSession.TickRate} t/s" : "N/A";
+				_sessionTime.text = netSession.IsConnected ? $"{netSession.Time:HH:mm:ss}" : "N/A";
+				_sessionPayload.text = netSession.IsConnected ? $"{netSession.EventPayloadSize} B" : "N/A";
 			} else {
 				_sessionConnected.text = "N/A";
 				_sessionPing.text = "N/A";
+				_sessionTickRate.text = "N/A";
+				_sessionTime.text = "N/A";
+				_sessionPayload.text = "N/A";
 			}
 
 			_worldId.text = _session.Dimensions?.Identifier.ToString() ?? "No world loaded";
