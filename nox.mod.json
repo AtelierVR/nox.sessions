@@ -55,11 +55,6 @@
     },
     {
       "id": "servers",
-      "type": "recommends",
-      "register": "git+https://github.com/AtelierVR/nox.servers.git"
-    },
-    {
-      "id": "servers",
       "type": "depends",
       "register": "git+https://github.com/AtelierVR/nox.servers.git"
     },
