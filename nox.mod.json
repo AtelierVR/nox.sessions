@@ -5,7 +5,7 @@
     "session"
   ],
   "name": "Sessions",
-  "version": "1.0.0",
+  "version": "1.0.x",
   "description": "Session lifecycle management, joining, and player synchronization.",
   "license": "GPL-3.0",
   "icon": null,
