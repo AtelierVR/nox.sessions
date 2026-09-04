@@ -6,13 +6,13 @@ using Nox.CCK.Language;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
 using Nox.CCK.Sessions;
-using Nox.CCK.Scripting;
 using Nox.Scripting;
 using Nox.Session.Runtime.Commands;
 using Nox.Sessions.Runtime.Converters;
 using Nox.Sessions.Runtime.Modules;
 using Nox.Sessions.Runtime.Settings;
 using Nox.Settings;
+using UnityEngine;
 using UnityEngine.Events;
 
 #if UNITY_EDITOR
@@ -180,20 +180,27 @@ namespace Nox.Sessions.Runtime {
 			if (Current != null)
 				TryGet(Current, out oSession);
 
-			Current = id;
+			Physics.simulationMode = SimulationMode.Script;
 
-			if (oSession != null)
-				await oSession.OnDeselect(nSession);
+			try {
+				Current = id;
 
-			if (nSession != null)
-				await nSession.OnSelect(oSession);
+				if (oSession != null)
+					await oSession.OnDeselect(nSession);
 
-			OnCurrentChanged.Invoke(oSession, nSession);
-			CoreAPI.EventAPI.Emit("session_current_changed", oSession, nSession);
+				if (nSession != null)
+					await nSession.OnSelect(oSession);
 
-			if (oSession?.IsDisposeOnChange() ?? false) {
-				await oSession.Dispose();
-				Remove(oSession);
+				OnCurrentChanged.Invoke(oSession, nSession);
+				CoreAPI.EventAPI.Emit("session_current_changed", oSession, nSession);
+
+				if (oSession?.IsDisposeOnChange() ?? false) {
+					await oSession.Dispose();
+					Remove(oSession);
+				}
+			} finally {
+				// Réactiver la simulation physique une fois la session prête
+				Physics.simulationMode = SimulationMode.Update;
 			}
 		}
 
