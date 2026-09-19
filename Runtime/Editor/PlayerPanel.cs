@@ -1,16 +1,15 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Nox.Avatars.Players;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
 using Nox.CCK.Players;
-using Nox.CCK.Sessions;
 using Nox.CCK.Utils;
 using Nox.Editor.Panel;
 using Nox.Entities;
 using Nox.Players;
-using Nox.Sessions;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IPanel = Nox.Editor.Panel.IPanel;
@@ -51,8 +50,24 @@ namespace Nox.Sessions.Runtime.Editor {
 		public VisualElement Container;
 		public Label ValueLabel;
 		public Label FlagsLabel;
+		public string Group;
 		public DateTime LastUpdatedAt;
 		public DateTime ChangedAt;
+	}
+
+	/// <summary>
+	/// A section of the properties list.
+	/// </summary>
+	internal readonly struct PropertyGroup {
+		public readonly int    Order;
+		public readonly string Label;
+		public readonly string Description;
+
+		public PropertyGroup(int order, string label, string description) {
+			Order       = order;
+			Label       = label;
+			Description = description;
+		}
 	}
 
 	internal struct PartRow {
@@ -199,6 +214,14 @@ namespace Nox.Sessions.Runtime.Editor {
 				return;
 			}
 
+			// A property can also change group without the count changing (an UnassignedProperty gets
+			// bound to an avatar parameter, or released back): rebuild so it moves to the right section.
+			foreach (var property in properties)
+				if (_rows.TryGetValue(property.Key, out var existing) && existing.Group != GetPropertyGroup(property).Label) {
+					LoadProperties();
+					return;
+				}
+
 			var now = DateTime.UtcNow;
 
 			foreach (var property in properties) {
@@ -300,6 +323,45 @@ namespace Nox.Sessions.Runtime.Editor {
 			}
 		}
 
+		/// <summary>
+		/// Maps a property to its section. Matching is done on the concrete type <b>name</b> rather
+		/// than on a type reference on purpose: this editor assembly does not reference
+		/// Nox.Relay.Runtime, where the implementations live.
+		/// </summary>
+		private static PropertyGroup GetPropertyGroup(IProperty property) {
+			switch (property.GetType().Name) {
+				case "AvatarParameterProperty":
+					return new PropertyGroup(0, "Avatar Parameters",
+						"Bound to a live avatar parameter: read once per tick and sent according to its sync flags.");
+				case "UnassignedProperty":
+					return new PropertyGroup(1, "Unassigned (key never declared)",
+						"A value arrived for a key this entity has no property for, so Nox.Relay stored it as-is. " +
+						"If this section keeps growing with new keys, the other client is sending keys we never registered.");
+				case "Property":
+					return new PropertyGroup(2, "Raw",
+						"Plain key/value property declared by the entity itself.");
+				default:
+					return new PropertyGroup(3, property.GetType().Name,
+						"Custom IProperty implementation.");
+			}
+		}
+
+		private static VisualElement CreateGroupHeader(PropertyGroup group, int count) {
+			var header = new Label($"{group.Label}  ({count})");
+			header.tooltip = group.Description;
+
+			header.style.unityFontStyleAndWeight = FontStyle.Bold;
+			header.style.color                   = new Color(0.75f, 0.85f, 1f);
+			header.style.marginTop               = 10;
+			header.style.marginBottom            = 2;
+			header.style.marginLeft              = 2;
+			header.style.paddingLeft             = 6;
+			header.style.borderLeftWidth         = 2;
+			header.style.borderLeftColor         = new Color(0.35f, 0.55f, 0.9f);
+
+			return header;
+		}
+
 		private void LoadProperties() {
 			_propertiesList?.Clear();
 			_rows.Clear();
@@ -324,25 +386,45 @@ namespace Nox.Sessions.Runtime.Editor {
 			var itemAsset = _panel.API.AssetAPI.GetAsset<VisualTreeAsset>("panels/property-item.uxml");
 			var epoch     = DateTime.MinValue;
 
-			foreach (var property in properties) {
-				var item       = itemAsset.CloneTree();
-				var container  = item.Q<VisualElement>(); // root element of the template
-				var valueLabel = item.Q<Label>("value");
-				var flagsLabel = item.Q<Label>("flags");
+			// Group by concrete implementation instead of listing everything flat: that is what tells a
+			// parameter bound to the avatar apart from an incoming key this entity never declared.
+			var groups = properties
+				.Select(p => (Property: p, Group: GetPropertyGroup(p)))
+				.GroupBy(x => x.Group.Label)
+				.OrderBy(g => g.Min(x => x.Group.Order))
+				.ThenBy(g => g.Key, StringComparer.Ordinal);
 
-				item.Q<Label>("key").text = property.Name ?? $"Key: {property.Key}";
-				valueLabel.text           = FormatValue(property.Value);
-				flagsLabel.text           = $"Flags: {property.Flags}";
+			foreach (var group in groups) {
+				_propertiesList.Add(CreateGroupHeader(group.First().Group, group.Count()));
 
-				_propertiesList.Add(item);
+				// Named properties first (alphabetical), then the raw keys ascending — so an
+				// unexplained key is easy to pick out and stays in the same place between rebuilds.
+				var ordered = group
+					.OrderBy(x => x.Property.Name == null ? 1 : 0)
+					.ThenBy(x => x.Property.Name ?? string.Empty, StringComparer.Ordinal)
+					.ThenBy(x => x.Property.Key);
 
-				_rows[property.Key] = new PropertyRow {
-					Container     = container,
-					ValueLabel    = valueLabel,
-					FlagsLabel    = flagsLabel,
-					LastUpdatedAt = property.UpdatedAt,
-					ChangedAt     = epoch,
-				};
+				foreach (var (property, propertyGroup) in ordered) {
+					var item       = itemAsset.CloneTree();
+					var container  = item.Q<VisualElement>(); // root element of the template
+					var valueLabel = item.Q<Label>("value");
+					var flagsLabel = item.Q<Label>("flags");
+
+					item.Q<Label>("key").text = property.Name ?? $"Key: {property.Key}";
+					valueLabel.text           = FormatValue(property.Value);
+					flagsLabel.text           = $"Flags: {property.Flags}";
+
+					_propertiesList.Add(item);
+
+					_rows[property.Key] = new PropertyRow {
+						Container     = container,
+						ValueLabel    = valueLabel,
+						FlagsLabel    = flagsLabel,
+						Group         = propertyGroup.Label,
+						LastUpdatedAt = property.UpdatedAt,
+						ChangedAt     = epoch,
+					};
+				}
 			}
 		}
 	}
