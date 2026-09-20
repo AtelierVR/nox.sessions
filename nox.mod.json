@@ -39,7 +39,7 @@
       "register": "git+https://github.com/AtelierVR/nox.players.git"
     },
     {
-      "id": "avatars",
+      "id": "avatar",
       "type": "depends",
       "register": "git+https://github.com/AtelierVR/nox.avatars.git"
     },
@@ -72,6 +72,11 @@
       "id": "com.unity.modules.ui",
       "type": "depends",
       "register": "upm+com.unity.modules.ui@1.0.0"
+    },
+    {
+      "id": "session",
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/api.nox.session.git"
     }
   ],
   "constraints": [
