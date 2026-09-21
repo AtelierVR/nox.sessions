@@ -77,6 +77,11 @@
       "id": "session",
       "type": "depends",
       "register": "git+https://github.com/AtelierVR/api.nox.session.git"
+    },
+    {
+      "id": "nox.editor.panel",
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.editor.panel.git"
     }
   ],
   "constraints": [
