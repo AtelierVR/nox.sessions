@@ -191,6 +191,8 @@ namespace Nox.Sessions.Runtime {
 				if (nSession != null)
 					await nSession.OnSelect(oSession);
 
+				Physics.simulationMode = SimulationMode.Update;
+
 				OnCurrentChanged.Invoke(oSession, nSession);
 				CoreAPI.EventAPI.Emit("session_current_changed", oSession, nSession);
 
@@ -199,7 +201,6 @@ namespace Nox.Sessions.Runtime {
 					Remove(oSession);
 				}
 			} finally {
-				// Réactiver la simulation physique une fois la session prête
 				Physics.simulationMode = SimulationMode.Update;
 			}
 		}
