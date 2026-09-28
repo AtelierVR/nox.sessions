@@ -273,7 +273,9 @@ namespace Nox.Sessions.Runtime.Editor {
 				// Detect change by UpdatedAt
 				if (property.UpdatedAt != row.LastUpdatedAt) {
 					row.ValueLabel.text = FormatValue(property.Value);
-					row.FlagsLabel.text = $"Flags: {property.Flags}";
+					row.FlagsLabel.text = property.Flags.ToString();
+					row.ValueLabel.tooltip = row.ValueLabel.text;
+					row.FlagsLabel.tooltip = row.FlagsLabel.text;
 					row.ChangedAt       = now;
 					row.LastUpdatedAt   = property.UpdatedAt;
 					_rows[property.Key] = row;
@@ -535,7 +537,7 @@ namespace Nox.Sessions.Runtime.Editor {
 					var keyLabel = item.Q<Label>("key");
 					keyLabel.text = property.Name ?? $"Key: {property.Key}";
 					valueLabel.text = FormatValue(property.Value);
-					flagsLabel.text = $"Flags: {property.Flags}";
+					flagsLabel.text = property.Flags.ToString();
 
 					// The row is ellipsized to fit the panel: the tooltip keeps the full content readable.
 					keyLabel.tooltip   = keyLabel.text;
