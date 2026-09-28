@@ -34,7 +34,7 @@
                 <ui:Label text="Avatar" class="text-lg mb-8" />
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
                     <ui:Label text="Identifier" style="min-width: 120px; opacity: 0.7;" />
-                    <ui:Label name="avatar-id" text="-" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
+                    <ui:Label name="avatar-id" text="-" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; -unity-text-overflow-position: start; white-space: nowrap;" />
                 </ui:VisualElement>
             </ui:GroupBox>
 

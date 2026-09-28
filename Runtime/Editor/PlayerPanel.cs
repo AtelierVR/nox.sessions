@@ -221,6 +221,45 @@ namespace Nox.Sessions.Runtime.Editor {
 			return $"Buffer ({b.Length}) {hex}{ellipsis}";
 		}
 
+		/// <summary>Above this length a label is likely elided, so its tooltip carries the full text.</summary>
+		private const int TooltipThreshold = 64;
+
+		/// <summary>Maximum length of a path-like value before its leading segments are dropped.</summary>
+		private const int PathMaxLength = 96;
+
+		/// <summary>
+		/// Shortens a path-like value by dropping whole leading segments, so the cut falls on a separator
+		/// instead of in the middle of a segment: <c>/a/b/c/d</c> becomes <c>…/c/d</c>. The tail is kept,
+		/// like the left ellipsis of the labels. A value without separator is returned as-is and left to
+		/// the label ellipsis.
+		/// </summary>
+		private static string ShortenPath(string value) {
+			if (string.IsNullOrEmpty(value) || value.Length <= PathMaxLength || !value.Contains('/'))
+				return value;
+
+			var segments = value.Split('/');
+			var result   = segments[segments.Length - 1];
+
+			for (var i = segments.Length - 2; i >= 0; i--) {
+				var candidate = segments[i] + "/" + result;
+				if (candidate.Length + 2 > PathMaxLength) // +2 for the leading "…/"
+					break;
+				result = candidate;
+			}
+
+			return "…/" + result;
+		}
+
+		/// <summary>
+		/// Gives a label the HTML <c>title</c> behaviour: its tooltip carries the full text, but only when
+		/// the text is long enough to be elided (the actual elision depends on the panel width, which is
+		/// not known here, so the length is used as the hint).
+		/// </summary>
+		private static void SetTooltip(Label label, string full) {
+			if (label != null)
+				label.tooltip = full != null && full.Length > TooltipThreshold ? full : null;
+		}
+
 		private void OnTick() {
 			if (_player is not IEntity entity)
 				return;
@@ -272,12 +311,13 @@ namespace Nox.Sessions.Runtime.Editor {
 
 				// Detect change by UpdatedAt
 				if (property.UpdatedAt != row.LastUpdatedAt) {
-					row.ValueLabel.text = FormatValue(property.Value);
-					row.FlagsLabel.text = property.Flags.ToString();
-					row.ValueLabel.tooltip = row.ValueLabel.text;
-					row.FlagsLabel.tooltip = row.FlagsLabel.text;
-					row.ChangedAt       = now;
-					row.LastUpdatedAt   = property.UpdatedAt;
+						var value = FormatValue(property.Value);
+						var flags = property.Flags.ToString();
+
+						row.ValueLabel.text = ShortenPath(value);
+						row.FlagsLabel.text = flags;
+						SetTooltip(row.ValueLabel, value);
+						SetTooltip(row.FlagsLabel, flags);
 					_rows[property.Key] = row;
 				}
 
@@ -316,15 +356,16 @@ namespace Nox.Sessions.Runtime.Editor {
 
 			_title.text         = $"Player: {_player.Display}";
 			_playerId.text      = _player.Id.ToString();
-			_playerDisplay.text = _player.Display;
 			_playerLocal.text   = _player.IsLocal ? "Yes" : "No";
 			_playerMaster.text  = _player.IsMaster ? "Yes" : "No";
 
-			if (_player is IPlayerAvatar playerAvatar) {
-				var avatar = playerAvatar.GetAvatar();
-				_avatarId.text = avatar.ToString();
-			} else
-				_avatarId.text = "N/A";
+			var display = _player.Display;
+			_playerDisplay.text = display;
+			SetTooltip(_playerDisplay, display);
+
+			var avatar = _player is IPlayerAvatar playerAvatar ? playerAvatar.GetAvatar().ToString() : null;
+			_avatarId.text = ShortenPath(avatar ?? "N/A");
+			SetTooltip(_avatarId, avatar);
 
 			LoadParts();
 			LoadProperties();
@@ -431,8 +472,9 @@ namespace Nox.Sessions.Runtime.Editor {
 				var rotLabel  = item.Q<Label>("rotation");
 
 				var nameLabel = item.Q<Label>("name");
-				nameLabel.text = part.Id.ToPlayerRig().ToString();
-				nameLabel.tooltip = nameLabel.text;
+				var name      = part.Id.ToPlayerRig().ToString();
+				nameLabel.text = name;
+				SetTooltip(nameLabel, name);
 				posLabel.text = FormatVec3(part.Position);
 				rotLabel.text = FormatEuler(part.Rotation);
 
@@ -535,14 +577,17 @@ namespace Nox.Sessions.Runtime.Editor {
 					var flagsLabel = item.Q<Label>("flags");
 
 					var keyLabel = item.Q<Label>("key");
-					keyLabel.text = property.Name ?? $"Key: {property.Key}";
-					valueLabel.text = FormatValue(property.Value);
-					flagsLabel.text = property.Flags.ToString();
+					var key      = property.Name ?? $"Key: {property.Key}";
+					var value    = FormatValue(property.Value);
+					var flags    = property.Flags.ToString();
 
-					// The row is ellipsized to fit the panel: the tooltip keeps the full content readable.
-					keyLabel.tooltip   = keyLabel.text;
-					valueLabel.tooltip = valueLabel.text;
-					flagsLabel.tooltip = flagsLabel.text;
+					keyLabel.text   = ShortenPath(key);
+					valueLabel.text = ShortenPath(value);
+					flagsLabel.text = flags;
+
+					SetTooltip(keyLabel, key);
+					SetTooltip(valueLabel, value);
+					SetTooltip(flagsLabel, flags);
 
 					_propertiesList.Add(item);
 
