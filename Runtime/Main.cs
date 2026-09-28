@@ -14,6 +14,8 @@ using Nox.Sessions.Runtime.Settings;
 using Nox.Settings;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Threading;
+
 
 #if UNITY_EDITOR
 using Nox.Editor.Panel;
@@ -77,6 +79,7 @@ namespace Nox.Sessions.Runtime {
 				scripting.RegisterModule(TeamsModule.Module);
 				scripting.RegisterModule(NetworkModule.Module);
 				scripting.RegisterModule(GizmoModule.Module);
+				scripting.RegisterModule(PhysicsModule.Module);
 			}
 		}
 
@@ -120,6 +123,7 @@ namespace Nox.Sessions.Runtime {
 			scripting?.UnregisterModule(TeamsModule.Module);
 			scripting?.UnregisterModule(NetworkModule.Module);
 			scripting?.UnregisterModule(GizmoModule.Module);
+			scripting?.UnregisterModule(PhysicsModule.Module);
 
 			Instance = null;
 			CoreAPI  = null;
@@ -173,17 +177,21 @@ namespace Nox.Sessions.Runtime {
 		public bool Has(string id)
 			=> _sessions.Any(s => s.Id == id);
 
-		public async UniTask SetCurrent(string id) {
+		public async UniTask SetCurrent(string id, CancellationToken token = default) {
+			token.ThrowIfCancellationRequested();
+
 			if (Current == id)
 				return;
 
-			if (!TryGet(id, out var nSession))
+			ISession nSession = null;
+			if (id != null && !TryGet(id, out nSession))
 				return;
 
 			ISession oSession = null;
 			if (Current != null)
 				TryGet(Current, out oSession);
 
+			// Pause the simulation while switching sessions.
 			Physics.simulationMode = SimulationMode.Script;
 
 			try {
@@ -195,7 +203,14 @@ namespace Nox.Sessions.Runtime {
 				if (nSession != null)
 					await nSession.OnSelect(oSession);
 
-				Physics.simulationMode = SimulationMode.Update;
+				// The new current session drives the physics (simulation + gravity).
+				if (nSession is IPhysicalSession physical) {
+					Physics.simulationMode = physical.Simulation
+						? SimulationMode.Update
+						: SimulationMode.Script;
+					Physics.gravity = physical.Gravity;
+				} else
+					Physics.simulationMode = SimulationMode.Update;
 
 				OnCurrentChanged.Invoke(oSession, nSession);
 				CoreAPI.EventAPI.Emit("session_current_changed", oSession, nSession);
@@ -205,8 +220,36 @@ namespace Nox.Sessions.Runtime {
 					Remove(oSession);
 				}
 			} finally {
-				Physics.simulationMode = SimulationMode.Update;
+				// Never leave the simulation frozen when the current session does not
+				// drive the physics environment.
+				if (GetCurrentSession() is not IPhysicalSession)
+					Physics.simulationMode = SimulationMode.Update;
 			}
+		}
+
+		/// <summary>
+		/// Disposes the session with the given ID and unregisters it.
+		/// Follows the same current-session switching logic as <see cref="SetCurrent"/>,
+		/// except the session is always disposed: <c>dispose-on-change</c> is ignored.
+		/// </summary>
+		public async UniTask Close(string id, CancellationToken token = default) {
+			token.ThrowIfCancellationRequested();
+
+			if (!TryGet(id, out var session))
+				return;
+
+			// Do not dispose the session up front: let SetCurrent handle the current
+			// session (deselect, then dispose + unregister through dispose-on-change).
+			if (Current == id) {
+				await SetCurrent(null, token);
+				if (!Has(id))
+					return;
+			}
+
+			// Non-current session (e.g. connection in progress), or dispose-on-change
+			// disabled: dispose it explicitly.
+			await session.Dispose();
+			Remove(session);
 		}
 
 		public UnityEvent<ISession> OnSessionAdded { get; } = new();

@@ -2,9 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using Nox.CCK.Properties;
 using Nox.CCK.Utils;
-using Nox.Instances;
 using Nox.Sessions;
-using Nox.Worlds;
 using UnityEngine;
 
 namespace Nox.CCK.Sessions {
@@ -15,6 +13,11 @@ namespace Nox.CCK.Sessions {
 		private const string THUMBNAIL = "thumbnail";
 		private const string INSTANCE = "instance";
 		private const string WORLD = "world";
+		private const string SIMULATION = "simulation";
+		private const string GRAVITY = "gravity";
+
+		/// <summary>Default gravity, used when the session does not define one (matches Unity's).</summary>
+		public static readonly Vector3 DefaultGravity = new(0f, -9.81f, 0f);
 
 		public static bool IsDisposeOnChange(this ISession session)
 			=> session.TryGetProperty<bool>(PropertyHelper.StringToKey(DISPOSE_ON_CHANGE), out var value) && value;
@@ -59,10 +62,28 @@ namespace Nox.CCK.Sessions {
 		}
 
 		public static bool IsCurrent(ISessionAPI api, ISession session)
-			=> api.Current == session.Id;
+			=> api != null && api.Current == session.Id;
 
 		public static bool Match(this ISession session, Identifier world)
 			=> session.Dimensions.Identifier.Equals(world);
+
+		#region Physical
+
+		/// <summary>Whether the simulation runs while the session is current (defaults to <c>true</c>).</summary>
+		public static bool GetSimulation(this IPhysicalSession session)
+			=> session.Data.Get(SIMULATION, true);
+
+		public static void SetSimulation(this IPhysicalSession session, bool value)
+			=> session.Data.Set(SIMULATION, value);
+
+		/// <summary>Gravity vector applied while the session is current (defaults to <see cref="DefaultGravity"/>).</summary>
+		public static Vector3 GetGravity(this IPhysicalSession session)
+			=> session.Data.Get(GRAVITY, DefaultGravity);
+
+		public static void SetGravity(this IPhysicalSession session, Vector3 value)
+			=> session.Data.Set(GRAVITY, value);
+
+		#endregion
 
 		public static Identifier GetInstance(this ISession session) {
 			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(INSTANCE), out var value))

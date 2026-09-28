@@ -14,6 +14,12 @@ namespace Nox.Sessions {
 		/// Current status of the state.
 		/// </summary>
 		public Status Status { get; }
+
+		/// <summary>
+		/// Whether the current state can still be cancelled by the user.
+		/// When false, the UI should not offer a cancel action for this state.
+		/// </summary>
+		public bool Cancelable { get; }
 	}
 
 	public enum Status {

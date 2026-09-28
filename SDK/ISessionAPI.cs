@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Events;
 
@@ -56,8 +57,19 @@ namespace Nox.Sessions {
 		/// Set the current session by its ID.
 		/// </summary>
 		/// <param name="id"></param>
+		/// <param name="token">Cancellation token to cancel the switch operation.</param>
 		/// <returns></returns>
-		public UniTask SetCurrent(string id);
+		public UniTask SetCurrent(string id, CancellationToken token = default);
+
+		/// <summary>
+		/// Disposes the session with the given ID and unregisters it.
+		/// Follows the same current-session switching logic as <see cref="SetCurrent"/>,
+		/// except the session is <b>always</b> disposed: its dispose-on-change property is ignored.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="token">Cancellation token to cancel the close operation.</param>
+		/// <returns></returns>
+		public UniTask Close(string id, CancellationToken token = default);
 
 		/// <summary>
 		/// Invoked when a session is registered.

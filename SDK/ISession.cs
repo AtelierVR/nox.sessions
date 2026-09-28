@@ -29,6 +29,11 @@ namespace Nox.Sessions {
 		public TEntities Entities { get; }
 
 		/// <summary>
+		/// Session-scoped key-value data container.
+		/// </summary>
+		public IDataContainer Data { get; }
+
+		/// <summary>
 		/// The master player of the session.
 		/// </summary>
 		public IPlayer MasterPlayer { get; set; }
