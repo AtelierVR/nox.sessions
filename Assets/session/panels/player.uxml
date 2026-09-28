@@ -3,8 +3,8 @@
     <ui:VisualElement style="flex-grow: 1;">
         <ui:GroupBox class="m-0 p-8 border-b">
             <ui:VisualElement style="flex-direction: row; align-items: center;">
-                <ui:Button text="← Back" name="back" class="large" style="margin-right: 8px;" />
-                <ui:Label name="title" text="Player Details" class="text-lg" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
+                <ui:Button text="← Back" name="back" class="large" style="margin-right: 8px; flex-shrink: 0;" />
+                <ui:Label name="title" text="Player Details" class="text-lg" style="flex-grow: 1; flex-basis: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
             </ui:VisualElement>
         </ui:GroupBox>
         <ui:ScrollView style="flex-grow: 1;">
@@ -17,7 +17,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
                     <ui:Label text="Display Name" style="min-width: 120px; opacity: 0.7;" />
-                    <ui:Label name="player-display" text="-" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
+                    <ui:Label name="player-display" text="-" style="flex-grow: 1; flex-basis: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
                     <ui:Label text="Is Local" style="min-width: 120px; opacity: 0.7;" />
@@ -34,7 +34,7 @@
                 <ui:Label text="Avatar" class="text-lg mb-8" />
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
                     <ui:Label text="Identifier" style="min-width: 120px; opacity: 0.7;" />
-                    <ui:Label name="avatar-id" text="-" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; -unity-text-overflow-position: start; white-space: nowrap;" />
+                    <ui:Label name="avatar-id" text="-" style="flex-grow: 1; flex-basis: 0; overflow: hidden; text-overflow: ellipsis; -unity-text-overflow-position: start; white-space: nowrap;" />
                 </ui:VisualElement>
             </ui:GroupBox>
 
@@ -45,7 +45,7 @@
                     <ui:Label text="Name" style="min-width: 120px; opacity: 0.7;" />
                     <ui:VisualElement style="flex-direction: row; align-items: center; flex-grow: 1;">
                         <ui:VisualElement name="team-color" style="width: 12px; height: 12px; margin-right: 6px; border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px;" />
-                        <ui:Label name="team-name" text="-" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
+                        <ui:Label name="team-name" text="-" style="flex-grow: 1; flex-basis: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
