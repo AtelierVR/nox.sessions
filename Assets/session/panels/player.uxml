@@ -4,7 +4,7 @@
         <ui:GroupBox class="m-0 p-8 border-b">
             <ui:VisualElement style="flex-direction: row; align-items: center;">
                 <ui:Button text="← Back" name="back" class="large" style="margin-right: 8px;" />
-                <ui:Label name="title" text="Player Details" class="text-lg" style="flex-grow: 1;" />
+                <ui:Label name="title" text="Player Details" class="text-lg" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
             </ui:VisualElement>
         </ui:GroupBox>
         <ui:ScrollView style="flex-grow: 1;">
@@ -17,7 +17,7 @@
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
                     <ui:Label text="Display Name" style="min-width: 120px; opacity: 0.7;" />
-                    <ui:Label name="player-display" text="-" style="flex-grow: 1;" />
+                    <ui:Label name="player-display" text="-" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
                 </ui:VisualElement>
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
                     <ui:Label text="Is Local" style="min-width: 120px; opacity: 0.7;" />
@@ -34,7 +34,102 @@
                 <ui:Label text="Avatar" class="text-lg mb-8" />
                 <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
                     <ui:Label text="Identifier" style="min-width: 120px; opacity: 0.7;" />
-                    <ui:Label name="avatar-id" text="-" style="flex-grow: 1;" />
+                    <ui:Label name="avatar-id" text="-" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Team -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Team" class="text-lg mb-8" />
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Name" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:VisualElement style="flex-direction: row; align-items: center; flex-grow: 1;">
+                        <ui:VisualElement name="team-color" style="width: 12px; height: 12px; margin-right: 6px; border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px;" />
+                        <ui:Label name="team-name" text="-" style="flex-grow: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Id" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="team-id" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Vitals -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Vitals" class="text-lg mb-8" />
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Health" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="health" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Max Health" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="max-health" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Invisible" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="invisible" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Movement -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Movement" class="text-lg mb-8" />
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Walk Speed" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="walk-speed" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Move Acceleration" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="move-acceleration" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Jump Force" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="jump-force" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Sprint Multiplier" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="sprint-multiplier" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Air Control" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="air-control" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Fly Speed" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="fly-speed" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="May Fly" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="may-fly" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Immobilized" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="immobilized" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Flying" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="flying" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Crouching" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="crouching" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Sprinting" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="sprinting" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Nameplate -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Nameplate" class="text-lg mb-8" />
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Visible" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="nameplate-visible" text="-" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-direction: row; margin-bottom: 4px;">
+                    <ui:Label text="Health Bar" style="min-width: 120px; opacity: 0.7;" />
+                    <ui:Label name="healthbar-visible" text="-" style="flex-grow: 1;" />
                 </ui:VisualElement>
             </ui:GroupBox>
             

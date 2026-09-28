@@ -8,6 +8,7 @@ using Nox.CCK.Mods.Initializers;
 using Nox.CCK.Sessions;
 using Nox.CCK.Utils;
 using Nox.Editor.Panel;
+using Nox.Entities;
 using Nox.Players;
 using Nox.Sessions;
 using UnityEngine;
@@ -65,6 +66,8 @@ namespace Nox.Sessions.Runtime.Editor {
 		private Label _worldId;
 		private VisualElement _playersList;
 		private VisualElement _playersEmpty;
+		private VisualElement _teamsList;
+		private VisualElement _teamsEmpty;
 
 	public SessionDetailsInstance(SessionDetailsPanel panel, IWindow window, Dictionary<string, object> data) {
 		_panel = panel;
@@ -118,6 +121,7 @@ namespace Nox.Sessions.Runtime.Editor {
 		// Event handlers for auto-update
 		private void OnPlayerChanged(IPlayer player) {
 			RefreshPlayers();
+			RefreshTeams();
 		}
 		
 		private void OnStateChanged(IState state) {
@@ -184,6 +188,8 @@ namespace Nox.Sessions.Runtime.Editor {
 			_worldId = root.Q<Label>("world-id");
 			_playersList = root.Q<VisualElement>("players-list");
 			_playersEmpty = root.Q<VisualElement>("players-empty");
+			_teamsList = root.Q<VisualElement>("teams-list");
+			_teamsEmpty = root.Q<VisualElement>("teams-empty");
 
 			_back.RegisterCallback<ClickEvent>(OnBackClicked);
 			_refresh.RegisterCallback<ClickEvent>(OnRefreshClicked);
@@ -230,6 +236,7 @@ namespace Nox.Sessions.Runtime.Editor {
 
 			_worldId.text = _session.Dimensions?.Identifier.ToString() ?? "No world loaded";
 
+			RefreshTeams();
 			RefreshPlayers();
 		}
 
@@ -251,44 +258,100 @@ namespace Nox.Sessions.Runtime.Editor {
 
 			foreach (var player in players) {
 				var item = itemAsset.CloneTree();
-				
-				item.Q<Label>("display").text = player.Display;
+
+				var display = item.Q<Label>("display");
+				display.text = player.Display;
+
+				// Same rule as the nameplates: a player is shown with the colour of its team.
+				if (player.Team != null)
+					display.style.color = player.Team.Color;
+
 				item.Q<Label>("id").text = $"ID: {player.Id}";
 
 				var tags = item.Q<VisualElement>("tags");
-				if (player.IsLocal) {
-					var tag = new Label("Local");
-					tag.style.backgroundColor = new Color(0.2f, 0.6f, 0.9f, 0.3f);
-					tag.style.paddingLeft = 4;
-					tag.style.paddingRight = 4;
-					tag.style.paddingTop = 2;
-					tag.style.paddingBottom = 2;
-					tag.style.marginRight = 4;
-					tag.style.borderTopLeftRadius = 3;
-					tag.style.borderTopRightRadius = 3;
-					tag.style.borderBottomLeftRadius = 3;
-					tag.style.borderBottomRightRadius = 3;
-					tags.Add(tag);
-				}
-				if (player.IsMaster) {
-					var tag = new Label("Master");
-					tag.style.backgroundColor = new Color(0.9f, 0.6f, 0.2f, 0.3f);
-					tag.style.paddingLeft = 4;
-					tag.style.paddingRight = 4;
-					tag.style.paddingTop = 2;
-					tag.style.paddingBottom = 2;
-					tag.style.borderTopLeftRadius = 3;
-					tag.style.borderTopRightRadius = 3;
-					tag.style.borderBottomLeftRadius = 3;
-					tag.style.borderBottomRightRadius = 3;
-					tags.Add(tag);
-				}
+				if (player.IsLocal)
+					AddTag(tags, "Local", new Color(0.2f, 0.6f, 0.9f, 0.3f));
+				if (player.IsMaster)
+					AddTag(tags, "Master", new Color(0.9f, 0.6f, 0.2f, 0.3f));
+				if (player.Team is { } team)
+					AddTag(tags, team.Name, new Color(team.Color.r, team.Color.g, team.Color.b, 0.2f), team.Color);
 
 				var viewButton = item.Q<Button>("view");
 				viewButton.RegisterCallback<ClickEvent>(_ => OpenPlayer(player));
 
 				_playersList.Add(item);
 			}
+		}
+
+		/// <summary>
+		/// Lists the teams of the session (<see cref="ITeamSession"/>) with their colour and how many
+		/// players joined them — the colours the players are shown with.
+		/// </summary>
+		private void RefreshTeams() {
+			_teamsList?.Clear();
+
+			var teams = (_session as ITeamSession)?.GetTeams();
+			if (teams == null || teams.Length == 0) {
+				if (_teamsEmpty != null) _teamsEmpty.style.display = DisplayStyle.Flex;
+				if (_teamsList  != null) _teamsList.style.display  = DisplayStyle.None;
+				return;
+			}
+
+			if (_teamsEmpty != null) _teamsEmpty.style.display = DisplayStyle.None;
+			if (_teamsList  != null) _teamsList.style.display  = DisplayStyle.Flex;
+
+			var players = _session.Entities?.GetEntities<IPlayer>() ?? Array.Empty<IPlayer>();
+
+			foreach (var team in teams) {
+				var row = new VisualElement();
+				row.style.flexDirection     = FlexDirection.Row;
+				row.style.alignItems        = Align.Center;
+				row.style.paddingLeft       = 8;
+				row.style.paddingRight      = 8;
+				row.style.paddingTop        = 4;
+				row.style.paddingBottom     = 4;
+				row.style.borderBottomWidth = 1;
+				row.style.borderBottomColor = new Color(0.18f, 0.18f, 0.18f);
+
+				var swatch = new VisualElement();
+				swatch.style.width               = 12;
+				swatch.style.height              = 12;
+				swatch.style.marginRight         = 6;
+				swatch.style.backgroundColor     = team.Color;
+				swatch.style.borderTopLeftRadius     = 3;
+				swatch.style.borderTopRightRadius    = 3;
+				swatch.style.borderBottomLeftRadius  = 3;
+				swatch.style.borderBottomRightRadius = 3;
+				row.Add(swatch);
+
+				var name = new Label($"{team.Name}  (id {team.Id})");
+				name.style.flexGrow = 1;
+				row.Add(name);
+
+				var count   = players.Count(player => player.Team?.Id == team.Id);
+				var members = new Label(count > 1 ? $"{count} players" : $"{count} player");
+				members.style.opacity = 0.7f;
+				row.Add(members);
+
+				_teamsList.Add(row);
+			}
+		}
+
+		/// <summary>Adds a small rounded tag to a player row.</summary>
+		private static void AddTag(VisualElement tags, string text, Color background, Color? foreground = null) {
+			var tag = new Label(text);
+			tag.style.backgroundColor = background;
+			tag.style.color           = foreground ?? Color.white;
+			tag.style.paddingLeft     = 4;
+			tag.style.paddingRight    = 4;
+			tag.style.paddingTop      = 2;
+			tag.style.paddingBottom   = 2;
+			tag.style.marginRight     = 4;
+			tag.style.borderTopLeftRadius     = 3;
+			tag.style.borderTopRightRadius    = 3;
+			tag.style.borderBottomLeftRadius  = 3;
+			tag.style.borderBottomRightRadius = 3;
+			tags.Add(tag);
 		}
 
 		private void OpenPlayer(IPlayer player) {

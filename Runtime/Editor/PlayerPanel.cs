@@ -92,6 +92,25 @@ namespace Nox.Sessions.Runtime.Editor {
 		private Label _playerLocal;
 		private Label _playerMaster;
 		private Label _avatarId;
+		private VisualElement _teamColor;
+		private Label _teamName;
+		private Label _teamId;
+		private Label _health;
+		private Label _maxHealth;
+		private Label _invisible;
+		private Label _walkSpeed;
+		private Label _moveAcceleration;
+		private Label _jumpForce;
+		private Label _sprintMultiplier;
+		private Label _airControl;
+		private Label _flySpeed;
+		private Label _mayFly;
+		private Label _immobilized;
+		private Label _flying;
+		private Label _crouching;
+		private Label _sprinting;
+		private Label _nameplateVisible;
+		private Label _healthbarVisible;
 		private VisualElement _propertiesList;
 		private VisualElement _propertiesEmpty;
 		private VisualElement _partsList;
@@ -150,6 +169,25 @@ namespace Nox.Sessions.Runtime.Editor {
 			_playerLocal     = root.Q<Label>("player-local");
 			_playerMaster    = root.Q<Label>("player-master");
 			_avatarId        = root.Q<Label>("avatar-id");
+			_teamColor       = root.Q<VisualElement>("team-color");
+			_teamName        = root.Q<Label>("team-name");
+			_teamId          = root.Q<Label>("team-id");
+			_health          = root.Q<Label>("health");
+			_maxHealth       = root.Q<Label>("max-health");
+			_invisible       = root.Q<Label>("invisible");
+			_walkSpeed       = root.Q<Label>("walk-speed");
+			_moveAcceleration = root.Q<Label>("move-acceleration");
+			_jumpForce       = root.Q<Label>("jump-force");
+			_sprintMultiplier = root.Q<Label>("sprint-multiplier");
+			_airControl      = root.Q<Label>("air-control");
+			_flySpeed        = root.Q<Label>("fly-speed");
+			_mayFly          = root.Q<Label>("may-fly");
+			_immobilized     = root.Q<Label>("immobilized");
+			_flying          = root.Q<Label>("flying");
+			_crouching       = root.Q<Label>("crouching");
+			_sprinting       = root.Q<Label>("sprinting");
+			_nameplateVisible = root.Q<Label>("nameplate-visible");
+			_healthbarVisible = root.Q<Label>("healthbar-visible");
 			_propertiesList  = root.Q<VisualElement>("properties-list");
 			_propertiesEmpty = root.Q<VisualElement>("properties-empty");
 			_partsList       = root.Q<VisualElement>("parts-list");
@@ -184,6 +222,8 @@ namespace Nox.Sessions.Runtime.Editor {
 		private void OnTick() {
 			if (_player is not IEntity entity)
 				return;
+
+			RefreshStats();
 
 			// Mise à jour des parts
 			var parts = _player.GetParts();
@@ -284,6 +324,75 @@ namespace Nox.Sessions.Runtime.Editor {
 
 			LoadParts();
 			LoadProperties();
+			RefreshStats();
+		}
+
+		//  Entity data 
+
+		/// <summary>
+		/// Refreshes the entity data of the new model (team, vitals, movement, nameplate). Cheap reads:
+		/// a label is only touched when its text changes, so the periodic refresh does not dirty the
+		/// layout for nothing.
+		/// </summary>
+		private void RefreshStats() {
+			var player = _player;
+			if (player == null)
+				return;
+
+			var team = player.Team;
+
+			Set(_teamName, team?.Name ?? "No team");
+			Set(_teamId,   team != null ? team.Id.ToString() : "-");
+
+			if (_teamColor != null) {
+				_teamColor.style.display = team != null ? DisplayStyle.Flex : DisplayStyle.None;
+				if (team != null)
+					_teamColor.style.backgroundColor = team.Color;
+			}
+
+			Set(_health,    FormatFloat(player.Health));
+			Set(_maxHealth, FormatFloat(player.MaxHealth));
+			Set(_invisible, FormatBool(player.IsInvisible));
+
+			Set(_walkSpeed,        FormatFloat(player.WalkSpeed));
+			Set(_moveAcceleration, FormatFloat(player.MoveAcceleration));
+			Set(_jumpForce,        FormatFloat(player.JumpForce));
+			Set(_sprintMultiplier, FormatFloat(player.SprintMultiplier));
+			Set(_airControl,       FormatFloat(player.AirControl));
+			Set(_flySpeed,         FormatFloat(player.FlySpeed));
+			Set(_mayFly,           FormatBool(player.MayFly));
+			Set(_immobilized,      FormatBool(player.IsImmobilized));
+			Set(_flying,           FormatBool(player.IsFlying));
+			Set(_crouching,        FormatBool(player.IsCrouching));
+			Set(_sprinting,        FormatBool(player.IsSprinting));
+
+			Set(_nameplateVisible, FormatFlag(ReadFlag(player, "NameplateVisible")));
+			Set(_healthbarVisible, FormatFlag(ReadFlag(player, "HealthbarVisible")));
+		}
+
+		private static void Set(Label label, string value) {
+			if (label != null && label.text != value)
+				label.text = value;
+		}
+
+		private static string FormatFloat(float value) => value.ToString("0.###");
+		private static string FormatBool(bool value)   => value ? "Yes" : "No";
+
+		private static string FormatFlag(bool? value)
+			=> value switch {
+				true  => "Yes",
+				false => "No",
+				_     => "N/A",
+			};
+
+		/// <summary>
+		/// Reads a value from an interface this editor assembly does not reference: the nameplate flags
+		/// live in <c>Nox.Nameplate</c>, which the session assembly does not depend on. Same approach as
+		/// <see cref="GetPropertyGroup"/>, which matches the concrete type names on purpose.
+		/// </summary>
+		private static bool? ReadFlag(object target, string property) {
+			var value = target?.GetType().GetProperty(property)?.GetValue(target);
+			return value is bool flag ? flag : null;
 		}
 
 		private void LoadParts() {
