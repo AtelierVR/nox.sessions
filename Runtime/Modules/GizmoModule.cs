@@ -113,7 +113,8 @@ namespace Nox.Sessions.Runtime.Modules {
 						args.Length > 1 ? (Vector3)ctx.FromScript(args[1], typeof(Vector3)) : Vector3.up,
 						args.Length > 2 ? args[2].ToFloat() : 1f);
 					return null;
-				})				.AddMethod("solidDisc", (ctx, args) => {
+				})				
+				.AddMethod("solidDisc", (ctx, args) => {
 					NoxGizmos.DrawSolidDisc(
 						args.Length > 0 ? (Vector3)ctx.FromScript(args[0], typeof(Vector3)) : Vector3.zero,
 						args.Length > 1 ? (Vector3)ctx.FromScript(args[1], typeof(Vector3)) : Vector3.up,
