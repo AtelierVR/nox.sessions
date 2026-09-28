@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Nox.CCK;
 using Nox.CCK.Scripting;
@@ -11,6 +12,7 @@ namespace Nox.Sessions.Runtime.Modules {
 	/// import players from 'players';
 	///
 	/// players.local    // the local player, or null while the session is not ready
+	/// players.all      // always an array, empty while the session is not ready
 	/// players.count
 	/// players.at(0)
 	/// </code>
@@ -25,7 +27,7 @@ namespace Nox.Sessions.Runtime.Modules {
 				.WithTags("session")
 				.AddVariable("local",  ctx => ctx.Session?.LocalPlayer)
 				.AddVariable("master", ctx => ctx.Session?.MasterPlayer)
-				.AddVariable("all",    ctx => ctx.Session?.Entities.GetEntities<IPlayer>())
+				.AddVariable("all",    ctx => ctx.Session?.Entities.GetEntities<IPlayer>() ?? Array.Empty<IPlayer>())
 				.AddVariable("count",  ctx => ctx.Session?.Entities.GetCount<IPlayer>() ?? 0)
 				.AddMethod("at", (ctx, args) => {
 					if (ctx.Session == null || args.Length == 0)
