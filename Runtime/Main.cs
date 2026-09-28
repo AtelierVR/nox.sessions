@@ -72,7 +72,9 @@ namespace Nox.Sessions.Runtime {
 			var scripting = api.ModAPI.GetMod("scripting")?.GetInstance<IScriptingAPI>();
 			if (scripting != null) {
 				scripting.RegisterConverter(PlayerConverter.Player);
+				scripting.RegisterConverter(TeamConverter.Team);
 				scripting.RegisterModule(PlayersModule.Module);
+				scripting.RegisterModule(TeamsModule.Module);
 				scripting.RegisterModule(NetworkModule.Module);
 				scripting.RegisterModule(GizmoModule.Module);
 			}
@@ -113,7 +115,9 @@ namespace Nox.Sessions.Runtime {
 
 			var scripting = CoreAPI?.ModAPI.GetMod("scripting")?.GetInstance<IScriptingAPI>();
 			scripting?.UnregisterConverter(PlayerConverter.Player);
+			scripting?.UnregisterConverter(TeamConverter.Team);
 			scripting?.UnregisterModule(PlayersModule.Module);
+			scripting?.UnregisterModule(TeamsModule.Module);
 			scripting?.UnregisterModule(NetworkModule.Module);
 			scripting?.UnregisterModule(GizmoModule.Module);
 
