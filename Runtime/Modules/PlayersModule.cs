@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Nox.CCK;
 using Nox.CCK.Scripting;
@@ -17,27 +16,24 @@ namespace Nox.Sessions.Runtime.Modules {
 	/// players.at(0)
 	/// </code>
 	/// <para>
-	/// The values are live: read them from the namespace (a named import copies the value when the
-	/// script is loaded). The scripts only start once the session is ready, so <c>all</c> already
-	/// holds the local player when they run.
+	/// The module is tagged <c>session</c>: it is only bound in a session backend, where
+	/// <c>ctx.Session</c> is always set (hence the direct accesses) and the scripts only start once
+	/// the session is ready, so <c>all</c> already holds the local player. The values are live: read
+	/// them from the namespace, a named import copies the value when the script is loaded.
 	/// </para>
 	/// </summary>
 	public static class PlayersModule {
 		public static readonly IScriptingModuleDefinition Module =
 			ScriptingModuleBuilder.Create("players")
 				.WithTags("session")
-				.AddVariable("local",  ctx => ctx.Session?.LocalPlayer)
-				.AddVariable("master", ctx => ctx.Session?.MasterPlayer)
-				// Never null, even without a session: the getter stays live (a named import would have
-				// copied it) and the module can be bound by any session backend.
-				.AddVariable("all",    ctx => ctx.Session?.Entities.GetEntities<IPlayer>() ?? Array.Empty<IPlayer>())
-				.AddVariable("count",  ctx => ctx.Session?.Entities.GetCount<IPlayer>() ?? 0)
-				.AddMethod("at", (ctx, args) => {
-					if (ctx.Session == null || args.Length == 0)
-						return null;
-					var players = ctx.Session.Entities.GetEntities<IPlayer>();
-					return players.ElementAtOrDefault(args[0].ToInt());
-				})
+				.AddVariable("local",  ctx => ctx.Session.LocalPlayer)
+				.AddVariable("master", ctx => ctx.Session.MasterPlayer)
+				.AddVariable("all",    ctx => ctx.Session.Entities.GetEntities<IPlayer>())
+				.AddVariable("count",  ctx => ctx.Session.Entities.GetCount<IPlayer>())
+				.AddMethod("at", (ctx, args) => args.Length == 0
+					? null
+					: ctx.Session.Entities.GetEntities<IPlayer>()
+						.ElementAtOrDefault(args[0].ToInt()))
 				.Build();
 	}
 }
