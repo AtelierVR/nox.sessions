@@ -111,6 +111,8 @@ namespace Nox.Sessions.Runtime.Editor {
 		private Label _sprinting;
 		private Label _nameplateVisible;
 		private Label _healthbarVisible;
+		/// <summary>Team colour last applied, so the swatch/name style is not touched every tick.</summary>
+		private int _teamColorId = int.MinValue;
 		private VisualElement _propertiesList;
 		private VisualElement _propertiesEmpty;
 		private VisualElement _partsList;
@@ -344,10 +346,19 @@ namespace Nox.Sessions.Runtime.Editor {
 			Set(_teamName, team?.Name ?? "No team");
 			Set(_teamId,   team != null ? team.Id.ToString() : "-");
 
-			if (_teamColor != null) {
-				_teamColor.style.display = team != null ? DisplayStyle.Flex : DisplayStyle.None;
-				if (team != null)
-					_teamColor.style.backgroundColor = team.Color;
+			// The team name carries the colour of the team (the swatch next to it as well).
+			var teamColorId = team?.Id ?? -1;
+			if (teamColorId != _teamColorId) {
+				_teamColorId = teamColorId;
+
+				if (_teamColor != null) {
+					_teamColor.style.display = team != null ? DisplayStyle.Flex : DisplayStyle.None;
+					if (team != null)
+						_teamColor.style.backgroundColor = team.Color;
+				}
+
+				if (_teamName != null)
+					_teamName.style.color = team != null ? team.Color : StyleKeyword.Null;
 			}
 
 			Set(_health,    FormatFloat(player.Health));
@@ -417,7 +428,9 @@ namespace Nox.Sessions.Runtime.Editor {
 				var posLabel  = item.Q<Label>("position");
 				var rotLabel  = item.Q<Label>("rotation");
 
-				item.Q<Label>("name").text = part.Id.ToPlayerRig().ToString();
+				var nameLabel = item.Q<Label>("name");
+				nameLabel.text = part.Id.ToPlayerRig().ToString();
+				nameLabel.tooltip = nameLabel.text;
 				posLabel.text = FormatVec3(part.Position);
 				rotLabel.text = FormatEuler(part.Rotation);
 
@@ -519,9 +532,15 @@ namespace Nox.Sessions.Runtime.Editor {
 					var valueLabel = item.Q<Label>("value");
 					var flagsLabel = item.Q<Label>("flags");
 
-					item.Q<Label>("key").text = property.Name ?? $"Key: {property.Key}";
-					valueLabel.text           = FormatValue(property.Value);
-					flagsLabel.text           = $"Flags: {property.Flags}";
+					var keyLabel = item.Q<Label>("key");
+					keyLabel.text = property.Name ?? $"Key: {property.Key}";
+					valueLabel.text = FormatValue(property.Value);
+					flagsLabel.text = $"Flags: {property.Flags}";
+
+					// The row is ellipsized to fit the panel: the tooltip keeps the full content readable.
+					keyLabel.tooltip   = keyLabel.text;
+					valueLabel.tooltip = valueLabel.text;
+					flagsLabel.tooltip = flagsLabel.text;
 
 					_propertiesList.Add(item);
 

@@ -326,6 +326,11 @@ namespace Nox.Sessions.Runtime.Editor {
 
 				var name = new Label($"{team.Name}  (id {team.Id})");
 				name.style.flexGrow = 1;
+				name.style.color    = team.Color;
+				name.style.overflow     = Overflow.Hidden;
+				name.style.textOverflow = TextOverflow.Ellipsis;
+				name.style.whiteSpace   = WhiteSpace.NoWrap;
+				name.tooltip = $"{team.Name} (id {team.Id})";
 				row.Add(name);
 
 				var count   = players.Count(player => player.Team?.Id == team.Id);
