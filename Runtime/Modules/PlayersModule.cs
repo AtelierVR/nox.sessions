@@ -8,8 +8,16 @@ namespace Nox.Sessions.Runtime.Modules {
 	/// <summary>
 	/// Scripting module <c>"players"</c> — access to session players.
 	/// <code>
-	/// import { local, master, all, count, at } from 'players';
+	/// import players from 'players';
+	///
+	/// players.local    // the local player, or null while the session is not ready
+	/// players.count
+	/// players.at(0)
 	/// </code>
+	/// <para>
+	/// The values are live: read them from the namespace (a named import copies the value when the
+	/// script is loaded, before any player joins).
+	/// </para>
 	/// </summary>
 	public static class PlayersModule {
 		public static readonly IScriptingModuleDefinition Module =

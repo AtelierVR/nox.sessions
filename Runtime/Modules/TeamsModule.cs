@@ -11,13 +11,18 @@ namespace Nox.Sessions.Runtime.Modules {
 	/// <summary>
 	/// Scripting module <c>"teams"</c> — the teams of the current session and the relations between them.
 	/// <code>
-	/// import { all, count, at, get, create, remove, relation, setRelation } from 'teams';
+	/// import teams from 'teams';
+	///
+	/// teams.all
+	/// teams.create('Rouge', Color.red)
 	/// </code>
 	/// <para>
-	/// A player's team is exposed as <c>player.team</c> (an <c>ITeam</c>, or <c>null</c>): read it to
-	/// know the team, write it with an <c>ITeam</c> or a team id to assign one (<c>0</c> clears it).
-	/// The assignment is local — a world script that must agree across clients has to replicate the
-	/// choice itself (see <c>Assets/Samples/Worlds/scripts/team.js</c>).
+	/// The values (<c>all</c>, <c>count</c>) are live: read them from the namespace, a named import
+	/// copies them when the script is loaded. A player's team is exposed as <c>player.team</c>
+	/// (an <c>ITeam</c>, or <c>null</c>): read it to know the team, write it with an <c>ITeam</c> or a
+	/// team id to assign one (<c>0</c> clears it). The assignment is local — a world script that must
+	/// agree across clients has to replicate the choice itself (see
+	/// <c>Assets/Samples/Worlds/scripts/team.js</c>).
 	/// </para>
 	/// </summary>
 	public static class TeamsModule {
