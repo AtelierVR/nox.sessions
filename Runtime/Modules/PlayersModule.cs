@@ -11,14 +11,15 @@ namespace Nox.Sessions.Runtime.Modules {
 	/// <code>
 	/// import players from 'players';
 	///
-	/// players.local    // the local player, or null while the session is not ready
-	/// players.all      // always an array, empty while the session is not ready
+	/// players.local    // the local player, or null when the session has none yet
+	/// players.all      // always an array, empty while no player is registered
 	/// players.count
 	/// players.at(0)
 	/// </code>
 	/// <para>
 	/// The values are live: read them from the namespace (a named import copies the value when the
-	/// script is loaded, before any player joins).
+	/// script is loaded). The scripts only start once the session is ready, so <c>all</c> already
+	/// holds the local player when they run.
 	/// </para>
 	/// </summary>
 	public static class PlayersModule {
@@ -27,6 +28,8 @@ namespace Nox.Sessions.Runtime.Modules {
 				.WithTags("session")
 				.AddVariable("local",  ctx => ctx.Session?.LocalPlayer)
 				.AddVariable("master", ctx => ctx.Session?.MasterPlayer)
+				// Never null, even without a session: the getter stays live (a named import would have
+				// copied it) and the module can be bound by any session backend.
 				.AddVariable("all",    ctx => ctx.Session?.Entities.GetEntities<IPlayer>() ?? Array.Empty<IPlayer>())
 				.AddVariable("count",  ctx => ctx.Session?.Entities.GetCount<IPlayer>() ?? 0)
 				.AddMethod("at", (ctx, args) => {

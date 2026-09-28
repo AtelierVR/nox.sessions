@@ -18,7 +18,8 @@ namespace Nox.Sessions.Runtime.Modules {
 	/// </code>
 	/// <para>
 	/// The values (<c>all</c>, <c>count</c>) are live: read them from the namespace, a named import
-	/// copies them when the script is loaded. A player's team is exposed as <c>player.team</c>
+	/// copies them when the script is loaded. The scripts only start once the session is ready, so
+	/// <c>all</c> is already registered when they run. A player's team is exposed as <c>player.team</c>
 	/// (an <c>ITeam</c>, or <c>null</c>): read it to know the team, write it with an <c>ITeam</c> or a
 	/// team id to assign one (<c>0</c> clears it). The assignment is local — a world script that must
 	/// agree across clients has to replicate the choice itself (see
