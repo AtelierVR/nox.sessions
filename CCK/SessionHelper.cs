@@ -15,6 +15,7 @@ namespace Nox.CCK.Sessions {
 		private const string WORLD = "world";
 		private const string SIMULATION = "simulation";
 		private const string GRAVITY = "gravity";
+		private const string CAPACITY = "capacity";
 
 		/// <summary>Default gravity, used when the session does not define one (matches Unity's).</summary>
 		public static readonly Vector3 DefaultGravity = new(0f, -9.81f, 0f);
@@ -115,6 +116,27 @@ namespace Nox.CCK.Sessions {
 			if (session is not IEditablePropertyObject epo)
 				return;
 			epo.SetProperty(PropertyHelper.StringToKey(WORLD), world);
+		}
+
+		/// <summary>Maximum players the session accepts, or <c>0</c> when unknown/unlimited.</summary>
+		public static int GetCapacity(this ISession session) {
+			if (!session.TryGetProperty<object>(PropertyHelper.StringToKey(CAPACITY), out var value) || value == null)
+				return 0;
+			return value switch {
+				int i          => i,
+				ushort u       => u,
+				uint ui        => (int)ui,
+				byte b         => b,
+				long l         => (int)l,
+				Func<int> func => func(),
+				_              => int.TryParse(value.ToString(), out var parsed) ? parsed : 0
+			};
+		}
+
+		public static void SetCapacity(this ISession session, int capacity) {
+			if (session is not IEditablePropertyObject epo)
+				return;
+			epo.SetProperty(PropertyHelper.StringToKey(CAPACITY), capacity);
 		}
 
 		public static string GetShortName(this ISession session) {

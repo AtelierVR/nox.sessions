@@ -87,6 +87,7 @@ namespace Nox.Sessions.Runtime {
 			=> GetCurrentSession()
 				?.Update();
 
+
 		private async UniTask CloseAll() {
 			await SetCurrent(null);
 
@@ -143,6 +144,7 @@ namespace Nox.Sessions.Runtime {
 			if (Has(session.Id))
 				return;
 			_sessions.Add(session);
+			// Player join/leave is already emitted by the session implementations.
 			OnSessionAdded.Invoke(session);
 			CoreAPI.EventAPI.Emit("session_added", session);
 		}
