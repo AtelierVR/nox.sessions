@@ -15,7 +15,8 @@ namespace Nox.Sessions.Runtime.Settings {
 			SetStep(.1f);
 			SetValue(CCK.Sessions.Settings.RenderEntityDistance);
 			SetLabelKey($"settings.entry.{string.Join(".", GetPath())}.label");
-			SetValueKey("settings.range.value.meters");
+			// Pas de 10 cm : l'affichage entier ("settings.range.value.meters") perdait les décimales.
+			SetValueKey("settings.range.value.float_meters");
 		}
 
 		override protected void OnValueChanged(float value)
