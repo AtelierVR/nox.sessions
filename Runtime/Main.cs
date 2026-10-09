@@ -114,7 +114,7 @@ namespace Nox.Sessions.Runtime {
 			_registers.Clear();
 
 			foreach (var handler in _handlers.ToArray())
-				SettingAPI.Remove(handler.GetPath());
+				SettingAPI.Remove(handler.Path);
 			_handlers = Array.Empty<IHandler>();
 
 			var scripting = CoreAPI?.ModAPI.GetMod("scripting")?.GetInstance<IScriptingAPI>();
