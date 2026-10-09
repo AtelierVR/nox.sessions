@@ -74,11 +74,6 @@
       "register": "upm+com.unity.modules.ui@1.0.0"
     },
     {
-      "id": "session",
-      "type": "depends",
-      "register": "git+https://github.com/AtelierVR/api.nox.session.git"
-    },
-    {
       "id": "nox.editor.panel",
       "type": "depends",
       "register": "git+https://github.com/AtelierVR/nox.editor.panel.git"
