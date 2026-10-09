@@ -35,7 +35,7 @@ namespace Nox.Sessions.Clients.Widgets {
 			var component = instance.AddComponent<RespawnWidget>();
 			var button = Reference.GetComponent<Button>("button", instance);
 			button.onClick.AddListener(OnRespawn);
-			instance.name = $"[{component.GetKey()}_{instance.GetEntityId().GetHashCode()}]";
+			instance.name = $"[{component.GetKey()}_{instance.GetId()}]";
 			values = (instance, component);
 			prefab = Client.API.AssetAPI.GetAsset<GameObject>("ui:prefabs/widget.prefab");
 			component._content = Instantiate(prefab, Reference.GetComponent<RectTransform>("content", instance));

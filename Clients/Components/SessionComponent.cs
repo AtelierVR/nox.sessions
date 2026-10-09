@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using Nox.CCK.Language;
 using Nox.CCK.Sessions;
@@ -58,7 +57,7 @@ namespace Nox.Sessions.Clients.Components {
 			var content = Instantiate(Client.API.AssetAPI.GetAsset<GameObject>("ui:prefabs/split.prefab"), parent);
 			var component = content.AddComponent<SessionComponent>();
 			component.Page = page;
-			content.name = $"[{page.GetKey()}_{content.GetEntityId().GetHashCode()}]";
+			content.name = $"[{page.GetKey()}_{content.GetId()}]";
 
 			var splitContent = Reference.GetComponent<RectTransform>("content", content);
 
