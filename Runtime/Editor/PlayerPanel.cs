@@ -5,7 +5,7 @@ using System.Linq;
 using Nox.Avatars.Players;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
-using Nox.CCK.Players;
+using Nox.CCK.Entities;
 using Nox.CCK.Utils;
 using Nox.Editor.Panel;
 using Nox.Entities;
@@ -472,7 +472,7 @@ namespace Nox.Sessions.Runtime.Editor {
 				var rotLabel  = item.Q<Label>("rotation");
 
 				var nameLabel = item.Q<Label>("name");
-				var name      = part.Id.ToPlayerRig().ToString();
+				var name      = part.Id.ToEntityRig().ToString();
 				nameLabel.text = name;
 				SetTooltip(nameLabel, name);
 				posLabel.text = FormatVec3(part.Position);
