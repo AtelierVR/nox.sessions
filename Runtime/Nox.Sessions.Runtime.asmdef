@@ -10,6 +10,7 @@
         "Nox.Terminals",
         "Nox.Players",
         "Nox.Entities",
+        "Nox.CCK.Entities",
         "Nox.CCK.Sessions",
         "Nox.Settings",
         "Nox.UI",

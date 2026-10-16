@@ -73,8 +73,10 @@ namespace Nox.Sessions.Runtime {
 
 			var scripting = api.ModAPI.GetMod("scripting")?.GetInstance<IScriptingAPI>();
 			if (scripting != null) {
+				scripting.RegisterConverter(EntityConverter.Entity);
 				scripting.RegisterConverter(PlayerConverter.Player);
 				scripting.RegisterConverter(TeamConverter.Team);
+				scripting.RegisterModule(EntityModule.Module);
 				scripting.RegisterModule(PlayersModule.Module);
 				scripting.RegisterModule(TeamsModule.Module);
 				scripting.RegisterModule(NetworkModule.Module);
@@ -86,7 +88,6 @@ namespace Nox.Sessions.Runtime {
 		public void OnUpdateMain()
 			=> GetCurrentSession()
 				?.Update();
-
 
 		private async UniTask CloseAll() {
 			await SetCurrent(null);
@@ -118,8 +119,10 @@ namespace Nox.Sessions.Runtime {
 			_handlers = Array.Empty<IHandler>();
 
 			var scripting = CoreAPI?.ModAPI.GetMod("scripting")?.GetInstance<IScriptingAPI>();
+			scripting?.UnregisterConverter(EntityConverter.Entity);
 			scripting?.UnregisterConverter(PlayerConverter.Player);
 			scripting?.UnregisterConverter(TeamConverter.Team);
+			scripting?.UnregisterModule(EntityModule.Module);
 			scripting?.UnregisterModule(PlayersModule.Module);
 			scripting?.UnregisterModule(TeamsModule.Module);
 			scripting?.UnregisterModule(NetworkModule.Module);

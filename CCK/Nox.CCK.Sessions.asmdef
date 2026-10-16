@@ -5,6 +5,7 @@
         "UniTask",
         "Nox.Sessions",
         "Nox.CCK",
+        "Nox.CCK.Entities",
         "Nox.Players",
         "Nox.Entities",
         "Nox.Worlds",
