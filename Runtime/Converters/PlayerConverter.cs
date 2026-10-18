@@ -18,13 +18,13 @@ namespace Nox.Sessions.Runtime.Converters {
 		public static readonly IScriptingTypeConverter Player =
 			ScriptingTypeConverterBuilder<IPlayer>.Create()
 				.AddProperty("display",
-					getter: p => (object)p.Display,
+					getter: p => p.Display,
 					setter: (p, val) => p.Display = val?.ToString() ?? "",
 					flags: ScriptingTypePropertyFlags.InspectGetter)
 				.AddProperty("identifier",
-					getter: p => (object)p.Identifier.ToString())
-				.AddProperty("isMaster", p => (object)p.IsMaster)
-				.AddProperty("isLocal",  p => (object)p.IsLocal)
+					getter: p => p.Identifier.ToString())
+				.AddProperty("isMaster", p => p.IsMaster)
+				.AddProperty("isLocal",  p => p.IsLocal)
 
 				.AddMethod("teleport", (ctx, p, args) => {
 					if (args.Length < 2)

@@ -50,7 +50,7 @@ namespace Nox.Sessions.Runtime.Modules {
 				.WithTags("session")
 				.AddVariable(
 					"simulation",
-					ctx => (object)Simulation(ctx),
+					ctx => Simulation(ctx),
 					(ctx, value) => {
 						var physical = Physical(ctx);
 						if (physical != null && value is bool simulation)
@@ -59,7 +59,7 @@ namespace Nox.Sessions.Runtime.Modules {
 				)
 				.AddVariable(
 					"gravity",
-					ctx => (object)Gravity(ctx),
+					ctx => Gravity(ctx),
 					(ctx, value) => {
 						var physical = Physical(ctx);
 						if (physical != null)

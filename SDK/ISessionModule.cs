@@ -97,5 +97,31 @@ namespace Nox.Sessions {
 		/// <para><paramref name="tickRate"/> is the new tick rate in ticks per second.</para>
 		/// </summary>
 		public void OnTickRateChanged(int tickRate) { }
+
+		/// <summary>
+		/// Invoked when a networked session starts trying to restore a lost connection.
+		/// <para><paramref name="attempt"/> is the attempt number, starting at 1.</para>
+		/// </summary>
+		/// <param name="attempt"></param>
+		public void OnReconnecting(int attempt) { }
+
+		/// <summary>
+		/// Invoked once a networked session is connected again and back in its room after a
+		/// disconnection (the world itself was never unloaded).
+		/// </summary>
+		public void OnReconnected() { }
+
+		/// <summary>
+		/// Invoked when the session is connected to the network.
+		/// A module loaded after the connection is established also receives it from
+		/// <see cref="OnLoaded"/> (the session replays the current state).
+		/// </summary>
+		public void OnConnected() { }
+
+		/// <summary>
+		/// Invoked when the session loses its network connection.
+		/// </summary>
+		/// <param name="reason">Why the connection was closed.</param>
+		public void OnDisconnected(string reason) { }
 	}
 }

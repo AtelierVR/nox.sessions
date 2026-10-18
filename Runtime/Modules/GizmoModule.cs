@@ -44,13 +44,13 @@ namespace Nox.Sessions.Runtime.Modules {
 				// ── IsEnabled ────────────────────────────────────────────────
 				.AddVariable(
 					"isEnabled",
-					getter: ctx => (object)IsEnabled,
+					getter: ctx => IsEnabled,
 					setter: (ctx, val) => { if (val is bool b) IsEnabled = b; }
 				)
 				// ── Color ────────────────────────────────────────────────────
 				.AddVariable(
 					"color",
-					getter: ctx => (object)NoxGizmos.Color,
+					getter: ctx => NoxGizmos.Color,
 					setter: (ctx, val) => {
 						if (val is Color c)
 							NoxGizmos.Color = c;

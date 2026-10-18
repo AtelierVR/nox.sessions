@@ -11,6 +11,16 @@ namespace Nox.Sessions {
 		public bool IsConnected { get; }
 
 		/// <summary>
+		/// Indicates whether the session is currently trying to restore a lost connection.
+		/// </summary>
+		public bool IsReconnecting { get; }
+
+		/// <summary>
+		/// Number of the current reconnection attempt, or 0 when no reconnection is running.
+		/// </summary>
+		public int ReconnectAttempt { get; }
+
+		/// <summary>
 		/// The utc time of the server.
 		/// If not connected, returns <see cref="DateTime.MinValue"/>.
 		/// </summary>
@@ -47,6 +57,17 @@ namespace Nox.Sessions {
 		/// Invoked when the session is disconnected from the network.
 		/// </summary>
 		public UnityEvent<string> OnDisconnected { get; }
+
+		/// <summary>
+		/// Invoked with the attempt number (starting at 1) each time the session tries to
+		/// restore a lost connection.
+		/// </summary>
+		public UnityEvent<int> OnReconnecting { get; }
+
+		/// <summary>
+		/// Invoked once the session is connected again and back in its room after a disconnection.
+		/// </summary>
+		public UnityEvent OnReconnected { get; }
 		
 		/// <summary>
 		/// Invoked when the ping value changes significantly.

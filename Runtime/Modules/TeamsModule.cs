@@ -39,7 +39,7 @@ namespace Nox.Sessions.Runtime.Modules {
 				.WithTags("session")
 				.AddType("Team", TeamConverter.Team)
 				.AddVariable("all",   ctx => Teams(ctx)?.GetTeams() ?? Array.Empty<ITeam>())
-				.AddVariable("count", ctx => (object)(Teams(ctx)?.GetTeams().Length ?? 0))
+				.AddVariable("count", ctx => Teams(ctx)?.GetTeams().Length ?? 0)
 				.AddMethod("at", (ctx, args) => {
 					var teams = Teams(ctx)?.GetTeams();
 					return teams == null || args.Length == 0
