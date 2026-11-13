@@ -27,7 +27,8 @@ namespace Nox.Sessions {
 		public DateTime Time { get; }
 
 		/// <summary>
-		/// The ping to the server in milliseconds.
+		/// The ping to the server in milliseconds, with sub-millisecond precision (it is a
+		/// <see cref="double"/>, not a whole number of milliseconds).
 		/// If not connected, returns -1.
 		/// </summary>
 		public double Ping { get; }

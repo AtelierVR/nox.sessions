@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Nox.CCK;
 using Nox.CCK.Properties;
 using Nox.CCK.Utils;
 using Nox.Entities;

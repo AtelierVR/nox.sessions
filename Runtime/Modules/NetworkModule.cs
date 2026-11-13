@@ -17,7 +17,7 @@ namespace Nox.Sessions.Runtime.Modules {
 	/// network.connected      // transport connected
 	/// network.reconnecting   // reconnection loop running
 	/// network.reconnectAttempt
-	/// network.ping           // ms
+	/// network.ping           // ms, double (sub-millisecond precision)
 	/// network.tickrate       // ticks per second
 	/// network.payloadSize    // max event payload bytes
 	/// network.time           // server time
@@ -32,7 +32,7 @@ namespace Nox.Sessions.Runtime.Modules {
 				.AddVariable("connected",        ctx => (ctx.Session as INetSession)?.IsConnected ?? false)
 				.AddVariable("reconnecting",     ctx => (ctx.Session as INetSession)?.IsReconnecting ?? false)
 				.AddVariable("reconnectAttempt", ctx => (ctx.Session as INetSession)?.ReconnectAttempt ?? 0)
-				.AddVariable("ping",             ctx => (ctx.Session as INetSession)?.Ping ?? -1)
+				.AddVariable("ping",             ctx => (ctx.Session as INetSession)?.Ping ?? -1d)
 				.AddVariable("payloadSize",      ctx => (ctx.Session as INetSession)?.EventPayloadSize ?? 0)
 				.AddVariable("tickrate",         ctx => {
 					var net = ctx.Session as INetSession;

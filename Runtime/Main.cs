@@ -16,11 +16,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using System.Threading;
 
-
-#if UNITY_EDITOR
-using Nox.Editor.Panel;
-#endif
-
 namespace Nox.Sessions.Runtime {
 	public class Main : IMainModInitializer, ISessionAPI {
 		public static IMainModCoreAPI CoreAPI { get; private set; }
@@ -33,13 +28,6 @@ namespace Nox.Sessions.Runtime {
 			=> CoreAPI?.ModAPI
 				?.GetMod("settings")
 				?.GetInstance<ISettingAPI>();
-
-		#if UNITY_EDITOR
-		static internal IPanelAPI PanelAPI
-			=> CoreAPI?.ModAPI
-				?.GetMod("editor.panel")
-				?.GetInstance<IPanelAPI>();
-		#endif
 
 		internal ISession GetCurrentSession() {
 			if (Current == null)

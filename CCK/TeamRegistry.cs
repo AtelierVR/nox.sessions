@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Nox.Entities;
 using Nox.Sessions;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Nox.CCK.Sessions {
 	/// <summary>Default <see cref="ITeam"/>: a named and coloured group of a session.</summary>
@@ -35,6 +36,15 @@ namespace Nox.CCK.Sessions {
 		private int _nextId = 1;
 
 		/// <inheritdoc />
+		public UnityEvent<ITeam> OnTeamCreated { get; } = new();
+
+		/// <inheritdoc />
+		public UnityEvent<ITeam> OnTeamRemoved { get; } = new();
+
+		/// <inheritdoc />
+		public UnityEvent<ITeamEntity> OnTeamChanged { get; } = new();
+
+		/// <inheritdoc />
 		public ITeam[] GetTeams()
 			=> _teams.ToArray();
 
@@ -54,6 +64,7 @@ namespace Nox.CCK.Sessions {
 		public ITeam CreateTeam(string name, Color color) {
 			var team = new Team(_nextId++, name, color);
 			_teams.Add(team);
+			OnTeamCreated.Invoke(team);
 			return team;
 		}
 
@@ -72,8 +83,16 @@ namespace Nox.CCK.Sessions {
 					_relations.Remove(key);
 			}
 
+			OnTeamRemoved.Invoke(team);
 			return true;
 		}
+
+		/// <summary>
+		/// Announces that <paramref name="entity"/> now belongs to another team (or to none): the sessions owning
+		/// a registry forward it, so a listener of <see cref="OnTeamChanged"/> can refresh.
+		/// </summary>
+		public void NotifyTeamChanged(ITeamEntity entity)
+			=> OnTeamChanged.Invoke(entity);
 
 		/// <inheritdoc />
 		public TeamRelation GetRelation(ITeam team, ITeam other)

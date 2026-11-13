@@ -1,5 +1,6 @@
 using Nox.Entities;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Nox.Sessions {
 	/// <summary>
@@ -11,6 +12,15 @@ namespace Nox.Sessions {
 	/// </para>
 	/// </summary>
 	public interface ITeamSession {
+		/// <summary>Invoked when a team is created.</summary>
+		UnityEvent<ITeam> OnTeamCreated { get; }
+
+		/// <summary>Invoked when a team is removed (the entities keeping it are detached).</summary>
+		UnityEvent<ITeam> OnTeamRemoved { get; }
+
+		/// <summary>Invoked when an entity joined, left or changed team.</summary>
+		UnityEvent<ITeamEntity> OnTeamChanged { get; }
+
 		/// <summary>All teams registered in the session.</summary>
 		ITeam[] GetTeams();
 

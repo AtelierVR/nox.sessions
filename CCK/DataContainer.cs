@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Nox.CCK.Events;
-using Nox.Entities;
 
 namespace Nox.CCK.Sessions {
 	/// <summary>
@@ -12,6 +11,14 @@ namespace Nox.CCK.Sessions {
 		private readonly Dictionary<string, object> _values = new();
 
 		public NoxEvent<string[], object, object> OnChanged { get; } = new();
+
+		/// <summary>Names of the values currently stored (their dotted path), in no particular order.</summary>
+		public IEnumerable<string> Keys
+			=> _values.Keys;
+
+		/// <summary>Number of values currently stored.</summary>
+		public int Count
+			=> _values.Count;
 
 		public T Get<T>(string[] key, T @default = default) {			
 			if (key == null || key.Length == 0)
