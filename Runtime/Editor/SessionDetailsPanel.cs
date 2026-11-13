@@ -1,16 +1,12 @@
-#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nox.Avatars.Players;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
-using Nox.CCK.Sessions;
 using Nox.CCK.Utils;
 using Nox.Editor.Panel;
 using Nox.Entities;
 using Nox.Players;
-using Nox.Sessions;
 using UnityEngine;
 using UnityEngine.UIElements;
 using IPanel = Nox.Editor.Panel.IPanel;
@@ -40,6 +36,13 @@ namespace Nox.Sessions.Runtime.Editor {
 		public string GetLabel()
 			=> "Session/Details";
 
+		/// <summary>
+		/// Opened from the sessions list, never from the panel menu: it shows one session given as
+		/// data, so it is not a browsable page.
+		/// </summary>
+		public bool IsVisible()
+			=> false;
+
 		public IInstance Instantiate(IWindow window, Dictionary<string, object> data) {
 			if (Instance != null)
 				throw new InvalidOperationException("SessionDetailsPanel only supports a single instance.");
@@ -52,9 +55,12 @@ namespace Nox.Sessions.Runtime.Editor {
 		private readonly IWindow _window;
 		private readonly ISession _session;
 
+		/// <summary>Session API of this mod: the runtime entry point itself, no mod lookup needed.</summary>
+		private static ISessionAPI SessionAPI
+			=> Main.Instance;
+
 		private VisualElement _content;
 		private Button _back;
-		private Button _refresh;
 		private Label _title;
 		private Label _sessionId;
 		private Label _sessionState;
@@ -72,23 +78,33 @@ namespace Nox.Sessions.Runtime.Editor {
 	public SessionDetailsInstance(SessionDetailsPanel panel, IWindow window, Dictionary<string, object> data) {
 		_panel = panel;
 		_window = window;
-		
+
 		if (data != null && data.TryGetValue("session", out var sessionObj))
 			_session = sessionObj as ISession;
-		
+
 		// Subscribe to session events for auto-update
 		if (_session != null) {
 			_session.OnPlayerJoined.AddListener(OnPlayerChanged);
 			_session.OnPlayerLeft.AddListener(OnPlayerChanged);
 			_session.OnStateChanged.AddListener(OnStateChanged);
-			
+
 			if (_session is INetSession netSession) {
 				netSession.OnConnected.AddListener(OnConnectionChanged);
 				netSession.OnDisconnected.AddListener(OnDisconnectionChanged);
 				netSession.OnPingChanged.AddListener(OnPingChanged);
 				netSession.OnTickRateChanged.AddListener(OnTickRateChanged);
 			}
+
+			// The teams have their own events: a team created or removed, and a player switching team, are not
+			// player join/leave events.
+			if (_session is ITeamSession teamSession) {
+				teamSession.OnTeamCreated.AddListener(OnTeamCreated);
+				teamSession.OnTeamRemoved.AddListener(OnTeamRemoved);
+				teamSession.OnTeamChanged.AddListener(OnTeamChanged);
+			}
 		}
+
+		SessionAPI?.OnSessionRemoved.AddListener(OnSessionRemoved);
 	}
 
 		public IPanel GetPanel()
@@ -106,29 +122,71 @@ namespace Nox.Sessions.Runtime.Editor {
 				_session.OnPlayerJoined.RemoveListener(OnPlayerChanged);
 				_session.OnPlayerLeft.RemoveListener(OnPlayerChanged);
 				_session.OnStateChanged.RemoveListener(OnStateChanged);
-				
+
 				if (_session is INetSession netSession) {
 					netSession.OnConnected.RemoveListener(OnConnectionChanged);
 					netSession.OnDisconnected.RemoveListener(OnDisconnectionChanged);
 					netSession.OnPingChanged.RemoveListener(OnPingChanged);
 					netSession.OnTickRateChanged.RemoveListener(OnTickRateChanged);
 				}
+
+				if (_session is ITeamSession teamSession) {
+					teamSession.OnTeamCreated.RemoveListener(OnTeamCreated);
+					teamSession.OnTeamRemoved.RemoveListener(OnTeamRemoved);
+					teamSession.OnTeamChanged.RemoveListener(OnTeamChanged);
+				}
 			}
-			
+
+			SessionAPI?.OnSessionRemoved.RemoveListener(OnSessionRemoved);
+
 			_panel.Instance = null;
 		}
-		
+
+		/// <summary>
+		/// The displayed session was unregistered: the details page has nothing left to show, so it
+		/// falls back to the sessions list.
+		/// </summary>
+		private void OnSessionRemoved(ISession session) {
+			if (!ReferenceEquals(session, _session))
+				return;
+
+			GoBackToList();
+		}
+
 		// Event handlers for auto-update
 		private void OnPlayerChanged(IPlayer player) {
 			RefreshPlayers();
 			RefreshTeams();
 		}
-		
+
+		/// <summary>A team was created: it appears in the list, with no member yet.</summary>
+		private void OnTeamCreated(ITeam team)
+			=> RefreshTeamsAndPlayers();
+
+		/// <summary>
+		/// A team was removed: it leaves the list, and the players that kept it are detached from it, so the
+		/// player rows have to be rebuilt as well.
+		/// </summary>
+		private void OnTeamRemoved(ITeam team)
+			=> RefreshTeamsAndPlayers();
+
+		/// <summary>
+		/// A player joined, left or changed team: its colour, its tag and the member counts of the teams move.
+		/// </summary>
+		private void OnTeamChanged(ITeamEntity entity)
+			=> RefreshTeamsAndPlayers();
+
+		/// <summary>The two lists show the same data (the team of a player is shown on its row): rebuild both.</summary>
+		private void RefreshTeamsAndPlayers() {
+			RefreshTeams();
+			RefreshPlayers();
+		}
+
 		private void OnStateChanged(IState state) {
 			if (_sessionState != null)
 				_sessionState.text = state?.Status.ToString() ?? "Unknown";
 		}
-		
+
 		private void OnConnectionChanged() {
 			if (_sessionConnected != null)
 				_sessionConnected.text = "Yes";
@@ -143,7 +201,7 @@ namespace Nox.Sessions.Runtime.Editor {
 					_sessionPayload.text = $"{netSession.EventPayloadSize} B";
 			}
 		}
-		
+
 		private void OnDisconnectionChanged(string reason) {
 			if (_sessionConnected != null)
 				_sessionConnected.text = "No";
@@ -156,12 +214,12 @@ namespace Nox.Sessions.Runtime.Editor {
 			if (_sessionPayload != null)
 				_sessionPayload.text = "N/A";
 		}
-		
+
 		private void OnPingChanged(double ping) {
 			if (_sessionPing != null)
 				_sessionPing.text = $"{ping:F0} ms";
 		}
-		
+
 		private void OnTickRateChanged(int tickRate) {
 			if (_sessionTickRate != null)
 				_sessionTickRate.text = $"{tickRate} t/s";
@@ -176,7 +234,6 @@ namespace Nox.Sessions.Runtime.Editor {
 				.CloneTree();
 
 			_back = root.Q<Button>("back");
-			_refresh = root.Q<Button>("refresh");
 			_title = root.Q<Label>("title");
 			_sessionId = root.Q<Label>("session-id");
 			_sessionState = root.Q<Label>("session-state");
@@ -192,23 +249,24 @@ namespace Nox.Sessions.Runtime.Editor {
 			_teamsEmpty = root.Q<VisualElement>("teams-empty");
 
 			_back.RegisterCallback<ClickEvent>(OnBackClicked);
-			_refresh.RegisterCallback<ClickEvent>(OnRefreshClicked);
 
+			// No refresh button: the page follows the session events (state, connection, players, teams).
 			RefreshDetails();
 
 			return _content = root;
 		}
 
-	private void OnBackClicked(ClickEvent evt) {
-		if (!Main.PanelAPI.TryGetPanel(new ResourceIdentifier(null, new[] { "session", "sessions" }), out var panel)) {
+	private void OnBackClicked(ClickEvent evt)
+		=> GoBackToList();
+
+	/// <summary>Returns to the sessions list (the parent page of this one).</summary>
+	private void GoBackToList() {
+			if (!SessionPanels.API.TryGetPanel(new ResourceIdentifier(null, new[] { "session", "sessions" }), out var panel)) {
 			Logger.LogError("SessionsPanel not found");
 			return;
 		}
 		_window.SetActive(panel);
 	}
-
-		private void OnRefreshClicked(ClickEvent evt)
-			=> RefreshDetails();
 
 		private void RefreshDetails() {
 			if (_session == null) {
@@ -219,7 +277,7 @@ namespace Nox.Sessions.Runtime.Editor {
 			_title.text = $"Session: {_session.Id}";
 			_sessionId.text = _session.Id;
 			_sessionState.text = _session.State?.Status.ToString() ?? "Unknown";
-			
+
 			if (_session is INetSession netSession) {
 				_sessionConnected.text = netSession.IsConnected ? "Yes" : "No";
 				_sessionPing.text = netSession.IsConnected ? $"{netSession.Ping:F0} ms" : "N/A";
@@ -246,13 +304,13 @@ namespace Nox.Sessions.Runtime.Editor {
 			var players = _session.Entities?.GetEntities<IPlayer>()?.ToList() ?? new List<IPlayer>();
 
 			if (players.Count == 0) {
-				_playersEmpty.style.display = DisplayStyle.Flex;
-				_playersList.style.display = DisplayStyle.None;
+				SetVisible(_playersList, false);
+				SetVisible(_playersEmpty, true);
 				return;
 			}
 
-			_playersEmpty.style.display = DisplayStyle.None;
-			_playersList.style.display = DisplayStyle.Flex;
+			SetVisible(_playersList, true);
+			SetVisible(_playersEmpty, false);
 
 			var itemAsset = _panel.API.AssetAPI.GetAsset<VisualTreeAsset>("panels/player-item.uxml");
 
@@ -264,17 +322,17 @@ namespace Nox.Sessions.Runtime.Editor {
 
 				// Same rule as the nameplates: a player is shown with the colour of its team.
 				if (player.Team != null)
-					display.style.color = player.Team.Color;
+					SetTint(display, player.Team.Color);
 
 				item.Q<Label>("id").text = $"ID: {player.Id}";
 
 				var tags = item.Q<VisualElement>("tags");
 				if (player.IsLocal)
-					AddTag(tags, "Local", new Color(0.2f, 0.6f, 0.9f, 0.3f));
+					AddTag(tags, "Local", "badge-info");
 				if (player.IsMaster)
-					AddTag(tags, "Master", new Color(0.9f, 0.6f, 0.2f, 0.3f));
+					AddTag(tags, "Master", "badge-warning");
 				if (player.Team is { } team)
-					AddTag(tags, team.Name, new Color(team.Color.r, team.Color.g, team.Color.b, 0.2f), team.Color);
+					AddTag(tags, team.Name, "badge-muted", new Color(team.Color.r, team.Color.g, team.Color.b, 0.25f), team.Color);
 
 				var viewButton = item.Q<Button>("view");
 				viewButton.RegisterCallback<ClickEvent>(_ => OpenPlayer(player));
@@ -292,80 +350,103 @@ namespace Nox.Sessions.Runtime.Editor {
 
 			var teams = (_session as ITeamSession)?.GetTeams();
 			if (teams == null || teams.Length == 0) {
-				if (_teamsEmpty != null) _teamsEmpty.style.display = DisplayStyle.Flex;
-				if (_teamsList  != null) _teamsList.style.display  = DisplayStyle.None;
+				SetVisible(_teamsList, false);
+				SetVisible(_teamsEmpty, true);
 				return;
 			}
 
-			if (_teamsEmpty != null) _teamsEmpty.style.display = DisplayStyle.None;
-			if (_teamsList  != null) _teamsList.style.display  = DisplayStyle.Flex;
+			SetVisible(_teamsList, true);
+			SetVisible(_teamsEmpty, false);
 
 			var players = _session.Entities?.GetEntities<IPlayer>() ?? Array.Empty<IPlayer>();
 
 			foreach (var team in teams) {
 				var row = new VisualElement();
-				row.style.flexDirection     = FlexDirection.Row;
-				row.style.alignItems        = Align.Center;
-				row.style.paddingLeft       = 8;
-				row.style.paddingRight      = 8;
-				row.style.paddingTop        = 4;
-				row.style.paddingBottom     = 4;
-				row.style.borderBottomWidth = 1;
-				row.style.borderBottomColor = new Color(0.18f, 0.18f, 0.18f);
+				row.AddToClassList("row");
+				row.AddToClassList("row-sm");
 
 				var swatch = new VisualElement();
-				swatch.style.width               = 12;
-				swatch.style.height              = 12;
-				swatch.style.marginRight         = 6;
-				swatch.style.backgroundColor     = team.Color;
-				swatch.style.borderTopLeftRadius     = 3;
-				swatch.style.borderTopRightRadius    = 3;
-				swatch.style.borderBottomLeftRadius  = 3;
-				swatch.style.borderBottomRightRadius = 3;
+				swatch.AddToClassList("swatch");
 				row.Add(swatch);
 
 				var name = new Label($"{team.Name}  (id {team.Id})");
-				name.style.flexGrow = 1;
-				name.style.color    = team.Color;
-				name.style.overflow     = Overflow.Hidden;
-				name.style.textOverflow = TextOverflow.Ellipsis;
-				name.style.whiteSpace   = WhiteSpace.NoWrap;
+				name.AddToClassList("flex-grow");
+				name.AddToClassList("text-ellipsis");
 				name.tooltip = $"{team.Name} (id {team.Id})";
 				row.Add(name);
 
+				// The colour of a team is data, not a style: it can only be applied at runtime.
+				SetTint(swatch, team.Color, background: true);
+				SetTint(name, team.Color);
+
 				var count   = players.Count(player => player.Team?.Id == team.Id);
 				var members = new Label(count > 1 ? $"{count} players" : $"{count} player");
-				members.style.opacity = 0.7f;
+				members.AddToClassList("muted");
 				row.Add(members);
 
 				_teamsList.Add(row);
 			}
 		}
 
-		/// <summary>Adds a small rounded tag to a player row.</summary>
-		private static void AddTag(VisualElement tags, string text, Color background, Color? foreground = null) {
+		/// <summary>
+		/// Shows or hides an element through the <c>hidden</c> class of <c>nox.style</c>: the panels
+		/// never set inline styles.
+		/// </summary>
+		private static void SetVisible(VisualElement element, bool visible)
+			=> element?.EnableInClassList("hidden", !visible);
+
+		/// <summary>
+		/// Applies a runtime colour (team colour) to an element. This is the only place of the panel
+		/// that writes an inline style: a USS class cannot carry a value known only at runtime.
+		/// </summary>
+		private static void SetTint(VisualElement element, Color? color, bool background = false) {
+			if (element == null)
+				return;
+
+			if (color == null) {
+				if (background)
+					element.style.backgroundColor = StyleKeyword.Null;
+				else
+					element.style.color = StyleKeyword.Null;
+
+				return;
+			}
+
+			if (background)
+				element.style.backgroundColor = color.Value;
+			else
+				element.style.color = color.Value;
+		}
+
+		/// <summary>
+		/// Adds a tag to a player row, using the badges of <c>nox.style</c>: the shared
+		/// <c>badge</c> shape plus a semantic variant (<c>badge-info</c>, <c>badge-warning</c>...).
+		/// The colours are only overridden for the team tag, which carries the colour of the team.
+		/// </summary>
+		private static void AddTag(VisualElement tags, string text, string variant, Color? background = null, Color? foreground = null) {
+			if (tags == null || string.IsNullOrEmpty(text))
+				return;
+
 			var tag = new Label(text);
-			tag.style.backgroundColor = background;
-			tag.style.color           = foreground ?? Color.white;
-			tag.style.paddingLeft     = 4;
-			tag.style.paddingRight    = 4;
-			tag.style.paddingTop      = 2;
-			tag.style.paddingBottom   = 2;
-			tag.style.marginRight     = 4;
-			tag.style.borderTopLeftRadius     = 3;
-			tag.style.borderTopRightRadius    = 3;
-			tag.style.borderBottomLeftRadius  = 3;
-			tag.style.borderBottomRightRadius = 3;
+			tag.AddToClassList("badge");
+			tag.AddToClassList("badge-sm");
+
+			if (!string.IsNullOrEmpty(variant))
+				tag.AddToClassList(variant);
+
+			SetTint(tag, background, background: true);
+			SetTint(tag, foreground);
+
 			tags.Add(tag);
 		}
 
 		private void OpenPlayer(IPlayer player) {
-			var data = new Dictionary<string, object> { 
+			var data = new Dictionary<string, object> {
 				{ "session", _session },
 				{ "player", player }
 			};
-			
-			if (!Main.PanelAPI.TryGetPanel(new ResourceIdentifier(null, new[] { "session", "player" }), out var panel)) {
+
+			if (!SessionPanels.API.TryGetPanel(new ResourceIdentifier(null, new[] { "session", "player" }), out var panel)) {
 				Logger.LogError("PlayerPanel not found");
 				return;
 			}
@@ -374,4 +455,3 @@ namespace Nox.Sessions.Runtime.Editor {
 		}
 	}
 }
-#endif

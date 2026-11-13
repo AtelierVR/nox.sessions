@@ -1,0 +1,20 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/nox.cck/Resources/nox.style.uss?fileID=7433441132597879392&amp;guid=956d93e835714844b98277f4fdbd77d3&amp;type=3#nox.style" />
+    <ui:VisualElement class="row">
+        <ui:VisualElement class="flex-grow flex-shrink">
+            <ui:Label name="title" text="Session" class="text-lg text-ellipsis" />
+            <ui:Label name="state" text="Unknown" class="muted text-ellipsis" />
+            <ui:Label name="connection" text="Disconnected" class="muted" />
+            <!-- Evenly split row of raw values: no `Label: value` prefix, the unit says it all.
+                 The meaning of each value is kept as a tooltip. -->
+            <ui:VisualElement name="net-info" class="flex-row flex-nowrap muted hidden">
+                <ui:Label name="ping" text="N/A" tooltip="Ping" class="flex-grow flex-basis-0" />
+                <ui:Label name="tickrate" text="N/A" tooltip="Tick rate" class="flex-grow flex-basis-0" />
+                <ui:Label name="time" text="N/A" tooltip="Server time" class="flex-grow flex-basis-0" />
+                <ui:Label name="payload" text="N/A" tooltip="Payload size" class="flex-grow flex-basis-0" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:Button name="view" text="View Details" class="large align-self-center flex-shrink-0" />
+    </ui:VisualElement>
+</ui:UXML>
+

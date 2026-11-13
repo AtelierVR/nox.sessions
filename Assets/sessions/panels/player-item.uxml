@@ -1,0 +1,12 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/nox.cck/Resources/nox.style.uss?fileID=7433441132597879392&amp;guid=956d93e835714844b98277f4fdbd77d3&amp;type=3#nox.style" />
+    <ui:VisualElement class="row">
+        <ui:VisualElement class="flex-grow flex-basis-0 flex-shrink px-8">
+            <ui:Label name="display" text="Player" class="text-lg text-ellipsis" />
+            <ui:Label name="id" text="ID: 0" class="muted" />
+            <ui:VisualElement name="tags" class="flex-row mt-4" />
+        </ui:VisualElement>
+        <ui:Button name="view" text="View Details" class="large align-self-center flex-shrink-0" />
+    </ui:VisualElement>
+</ui:UXML>
+

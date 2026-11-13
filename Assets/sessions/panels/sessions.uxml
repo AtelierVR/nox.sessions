@@ -1,0 +1,18 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/nox.cck/Resources/nox.style.uss?fileID=7433441132597879392&amp;guid=956d93e835714844b98277f4fdbd77d3&amp;type=3#nox.style" />
+    <ui:VisualElement class="flex-grow">
+        <ui:VisualElement class="header">
+            <ui:Label text="Sessions" class="text-lg flex-grow" />
+        </ui:VisualElement>
+        <!-- `scroll-full` lets the content fill the viewport, so the empty state can be centred
+             vertically (same as the empty state of the Assets builder/publisher panels). -->
+        <ui:ScrollView class="flex-grow scroll-full">
+            <ui:VisualElement name="list" class="flex-grow" />
+            <ui:VisualElement name="empty" class="empty hidden">
+                <ui:Label text="No Active Sessions" class="text-lg text-center mb-8" />
+                <ui:Label text="There are no active sessions at the moment." class="text-center muted" />
+            </ui:VisualElement>
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>
+

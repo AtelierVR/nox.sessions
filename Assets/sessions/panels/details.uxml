@@ -1,0 +1,70 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/nox.cck/Resources/nox.style.uss?fileID=7433441132597879392&amp;guid=956d93e835714844b98277f4fdbd77d3&amp;type=3#nox.style" />
+    <ui:VisualElement class="flex-grow">
+        <ui:VisualElement class="header">
+            <ui:Button text="← Back" name="back" class="large me-8 flex-shrink-0" />
+            <ui:Label name="title" text="Session Details" class="text-lg flex-grow flex-basis-0 text-ellipsis" />
+        </ui:VisualElement>
+        <ui:ScrollView class="flex-grow">
+            <!-- Session Info -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Session Information" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="ID" class="kv-label" />
+                    <ui:Label name="session-id" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="State" class="kv-label" />
+                    <ui:Label name="session-state" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Connected" class="kv-label" />
+                    <ui:Label name="session-connected" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Ping" class="kv-label" />
+                    <ui:Label name="session-ping" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Tick Rate" class="kv-label" />
+                    <ui:Label name="session-tickrate" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Server Time" class="kv-label" />
+                    <ui:Label name="session-time" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Payload Size" class="kv-label" />
+                    <ui:Label name="session-payload" text="-" class="kv-value" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- World Info -->
+            <ui:GroupBox class="p-8 m-0 border-b" name="world-section">
+                <ui:Label text="World" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Identifier" class="kv-label" />
+                    <ui:Label name="world-id" text="-" class="kv-value text-ellipsis" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Teams List -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Teams" class="text-lg mb-8" />
+                <ui:VisualElement name="teams-list" class="flex-grow" />
+                <ui:VisualElement name="teams-empty" class="hidden">
+                    <ui:Label text="No teams" class="text-center muted" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Players List -->
+            <ui:GroupBox class="p-8 m-0">
+                <ui:Label text="Players" class="text-lg mb-8" />
+                <ui:VisualElement name="players-list" class="flex-grow" />
+                <ui:VisualElement name="players-empty" class="hidden">
+                    <ui:Label text="No players" class="text-center muted" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

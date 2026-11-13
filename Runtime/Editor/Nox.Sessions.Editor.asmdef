@@ -1,0 +1,29 @@
+﻿{
+    "name": "Nox.Sessions.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Nox.CCK.Assets",
+        "Nox.Sessions.Runtime",
+        "Nox.Sessions",
+        "Nox.Editor.Panel",
+        "Nox.CCK",
+        "Nox.CCK.Sessions",
+        "Nox.CCK.Entities",
+        "Nox.CCK.Avatars.Parameters",
+        "Nox.Entities",
+        "Nox.Players",
+        "Nox.Avatars",
+        "UniTask"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

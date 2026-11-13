@@ -1,0 +1,153 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/nox.cck/Resources/nox.style.uss?fileID=7433441132597879392&amp;guid=956d93e835714844b98277f4fdbd77d3&amp;type=3#nox.style" />
+    <ui:VisualElement class="flex-grow">
+        <ui:VisualElement class="header">
+            <ui:Button text="← Back" name="back" class="large me-8 flex-shrink-0" />
+            <ui:Label name="title" text="Player Details" class="text-lg flex-grow flex-basis-0 text-ellipsis" />
+        </ui:VisualElement>
+        <ui:ScrollView class="flex-grow">
+            <!-- Player Info -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Player Information" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="ID" class="kv-label" />
+                    <ui:Label name="player-id" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Display Name" class="kv-label" />
+                    <ui:Label name="player-display" text="-" class="kv-value text-ellipsis" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Is Local" class="kv-label" />
+                    <ui:Label name="player-local" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Is Master" class="kv-label" />
+                    <ui:Label name="player-master" text="-" class="kv-value" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Avatar Info -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Avatar" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Identifier" class="kv-label" />
+                    <ui:Label name="avatar-id" text="-" class="kv-value text-ellipsis" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Team -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Team" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Name" class="kv-label" />
+                    <ui:VisualElement class="flex-row align-center flex-grow">
+                        <ui:VisualElement name="team-color" class="swatch" />
+                        <ui:Label name="team-name" text="-" class="flex-grow flex-basis-0 text-ellipsis" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Id" class="kv-label" />
+                    <ui:Label name="team-id" text="-" class="kv-value" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Vitals -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Vitals" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Health" class="kv-label" />
+                    <ui:Label name="health" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Max Health" class="kv-label" />
+                    <ui:Label name="max-health" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Invisible" class="kv-label" />
+                    <ui:Label name="invisible" text="-" class="kv-value" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Movement -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Movement" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Walk Speed" class="kv-label" />
+                    <ui:Label name="walk-speed" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Move Acceleration" class="kv-label" />
+                    <ui:Label name="move-acceleration" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Jump Force" class="kv-label" />
+                    <ui:Label name="jump-force" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Sprint Multiplier" class="kv-label" />
+                    <ui:Label name="sprint-multiplier" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Air Control" class="kv-label" />
+                    <ui:Label name="air-control" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Fly Speed" class="kv-label" />
+                    <ui:Label name="fly-speed" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="May Fly" class="kv-label" />
+                    <ui:Label name="may-fly" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Immobilized" class="kv-label" />
+                    <ui:Label name="immobilized" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Flying" class="kv-label" />
+                    <ui:Label name="flying" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Crouching" class="kv-label" />
+                    <ui:Label name="crouching" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Sprinting" class="kv-label" />
+                    <ui:Label name="sprinting" text="-" class="kv-value" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Nameplate -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Nameplate" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Visible" class="kv-label" />
+                    <ui:Label name="nameplate-visible" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Health Bar" class="kv-label" />
+                    <ui:Label name="healthbar-visible" text="-" class="kv-value" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Parts -->
+            <ui:GroupBox class="p-8 m-0 border-b">
+                <ui:Label text="Parts" class="text-lg mb-8" />
+                <ui:VisualElement name="parts-list" class="flex-grow" />
+                <ui:VisualElement name="parts-empty" class="hidden">
+                    <ui:Label text="No parts" class="text-center muted" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Properties -->
+            <ui:GroupBox class="p-8 m-0">
+                <ui:Label text="Properties" class="text-lg mb-8" />
+                <ui:VisualElement name="properties-list" class="flex-grow" />
+                <ui:VisualElement name="properties-empty" class="hidden">
+                    <ui:Label text="No properties" class="text-center muted" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+        </ui:ScrollView>
+    </ui:VisualElement>
+</ui:UXML>

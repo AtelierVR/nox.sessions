@@ -1,8 +1,8 @@
-﻿#if UNITY_EDITOR
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Nox.Avatars.Players;
+using Nox.CCK.Avatars.Parameters;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
 using Nox.CCK.Entities;
@@ -39,6 +39,13 @@ namespace Nox.Sessions.Runtime.Editor {
 		public string GetLabel()
 			=> "Session/Player";
 
+		/// <summary>
+		/// Opened from the session details, never from the panel menu: it shows one player given as
+		/// data, so it is not a browsable page.
+		/// </summary>
+		public bool IsVisible()
+			=> false;
+
 		public IInstance Instantiate(IWindow window, Dictionary<string, object> data) {
 			if (Instance != null)
 				throw new InvalidOperationException("PlayerPanel only supports a single instance.");
@@ -51,6 +58,8 @@ namespace Nox.Sessions.Runtime.Editor {
 		public Label ValueLabel;
 		public Label FlagsLabel;
 		public string Group;
+		/// <summary>Last rendered value, so a live property is caught even when it does not stamp.</summary>
+		public string Value;
 		public DateTime LastUpdatedAt;
 		public DateTime ChangedAt;
 	}
@@ -59,14 +68,27 @@ namespace Nox.Sessions.Runtime.Editor {
 	/// A section of the properties list.
 	/// </summary>
 	internal readonly struct PropertyGroup {
-		public readonly int    Order;
+		public readonly int Order;
 		public readonly string Label;
 		public readonly string Description;
 
-		public PropertyGroup(int order, string label, string description) {
+		/// <summary>
+		/// Whether the group is split into subsections, one per parameter category (the avatar parameters).
+		/// </summary>
+		public readonly bool Categorized;
+
+		/// <summary>
+		/// Category of the avatar parameter (snake_case), or <c>null</c> when it declares none: the
+		/// parameters without a category go to the « general » subsection.
+		/// </summary>
+		public readonly string Category;
+
+		public PropertyGroup(int order, string label, string description, bool categorized = false, string category = null) {
 			Order       = order;
 			Label       = label;
 			Description = description;
+			Categorized = categorized;
+			Category    = category;
 		}
 	}
 
@@ -129,7 +151,7 @@ namespace Nox.Sessions.Runtime.Editor {
 		private const int TickMs = 50;
 
 		public PlayerInstance(PlayerPanel panel, IWindow window, Dictionary<string, object> data) {
-			_panel  = panel;
+			_panel = panel;
 			_window = window;
 
 			if (data != null) {
@@ -138,6 +160,18 @@ namespace Nox.Sessions.Runtime.Editor {
 				if (data.TryGetValue("player", out var playerObj))
 					_player = playerObj as IPlayer;
 			}
+
+			_session?.OnPlayerLeft.AddListener(OnPlayerLeft);
+			_session?.Entities?.OnEntityRemoved.AddListener(OnEntityRemoved);
+
+			// The teams have their own events: a player switching team, or the team it uses being removed, is
+			// not a player event.
+			if (_session is ITeamSession teamSession) {
+				teamSession.OnTeamChanged.AddListener(OnTeamChanged);
+				teamSession.OnTeamRemoved.AddListener(OnTeamRemoved);
+			}
+
+			Main.Instance?.OnSessionRemoved.AddListener(OnSessionRemoved);
 		}
 
 		public IPanel GetPanel()
@@ -153,7 +187,68 @@ namespace Nox.Sessions.Runtime.Editor {
 			_schedule?.Pause();
 			_schedule = null;
 			_rows.Clear();
+
+			_session?.OnPlayerLeft.RemoveListener(OnPlayerLeft);
+			_session?.Entities?.OnEntityRemoved.RemoveListener(OnEntityRemoved);
+
+			if (_session is ITeamSession teamSession) {
+				teamSession.OnTeamChanged.RemoveListener(OnTeamChanged);
+				teamSession.OnTeamRemoved.RemoveListener(OnTeamRemoved);
+			}
+
+			Main.Instance?.OnSessionRemoved.RemoveListener(OnSessionRemoved);
+
 			_panel.Instance = null;
+		}
+
+		/// <summary>The displayed player left the session: back to the session page.</summary>
+		private void OnPlayerLeft(IPlayer player) {
+			if (_player == null || player == null || player.Id != _player.Id)
+				return;
+
+			LeavePage(GoBackToSession);
+		}
+
+		/// <summary>The displayed player joined, left or changed team: its team row follows it.</summary>
+		private void OnTeamChanged(ITeamEntity entity) {
+			if (_player == null || entity == null || entity.Id != _player.Id)
+				return;
+
+			RefreshStats();
+		}
+
+		/// <summary>
+		/// The team shown on this page was removed: the registry already dropped it, so the player now resolves
+		/// to no team and the row has to be rewritten.
+		/// </summary>
+		private void OnTeamRemoved(ITeam team) {
+			if (_player == null || team == null || _teamColorId != team.Id)
+				return;
+
+			RefreshStats();
+		}
+
+		/// <summary>The displayed player was unregistered from the entities: back to the session page.</summary>
+		private void OnEntityRemoved(IEntity entity) {
+			if (_player == null || entity == null || entity.Id != _player.Id)
+				return;
+
+			LeavePage(GoBackToSession);
+		}
+
+		/// <summary>The session was unregistered: even the session page is gone, back to the list.</summary>
+		private void OnSessionRemoved(ISession session) {
+			if (!ReferenceEquals(session, _session))
+				return;
+
+			LeavePage(GoBackToSessions);
+		}
+
+		/// <summary>Stops the auto-update before navigating away (the page is destroyed by the window).</summary>
+		private void LeavePage(Action navigate) {
+			_schedule?.Pause();
+			_schedule = null;
+			navigate?.Invoke();
 		}
 
 		public VisualElement GetContent() {
@@ -164,36 +259,36 @@ namespace Nox.Sessions.Runtime.Editor {
 				.GetAsset<VisualTreeAsset>("panels/player.uxml")
 				.CloneTree();
 
-			_back            = root.Q<Button>("back");
-			_title           = root.Q<Label>("title");
-			_playerId        = root.Q<Label>("player-id");
-			_playerDisplay   = root.Q<Label>("player-display");
-			_playerLocal     = root.Q<Label>("player-local");
-			_playerMaster    = root.Q<Label>("player-master");
-			_avatarId        = root.Q<Label>("avatar-id");
-			_teamColor       = root.Q<VisualElement>("team-color");
-			_teamName        = root.Q<Label>("team-name");
-			_teamId          = root.Q<Label>("team-id");
-			_health          = root.Q<Label>("health");
-			_maxHealth       = root.Q<Label>("max-health");
-			_invisible       = root.Q<Label>("invisible");
-			_walkSpeed       = root.Q<Label>("walk-speed");
+			_back = root.Q<Button>("back");
+			_title = root.Q<Label>("title");
+			_playerId = root.Q<Label>("player-id");
+			_playerDisplay = root.Q<Label>("player-display");
+			_playerLocal = root.Q<Label>("player-local");
+			_playerMaster = root.Q<Label>("player-master");
+			_avatarId = root.Q<Label>("avatar-id");
+			_teamColor = root.Q<VisualElement>("team-color");
+			_teamName = root.Q<Label>("team-name");
+			_teamId = root.Q<Label>("team-id");
+			_health = root.Q<Label>("health");
+			_maxHealth = root.Q<Label>("max-health");
+			_invisible = root.Q<Label>("invisible");
+			_walkSpeed = root.Q<Label>("walk-speed");
 			_moveAcceleration = root.Q<Label>("move-acceleration");
-			_jumpForce       = root.Q<Label>("jump-force");
+			_jumpForce = root.Q<Label>("jump-force");
 			_sprintMultiplier = root.Q<Label>("sprint-multiplier");
-			_airControl      = root.Q<Label>("air-control");
-			_flySpeed        = root.Q<Label>("fly-speed");
-			_mayFly          = root.Q<Label>("may-fly");
-			_immobilized     = root.Q<Label>("immobilized");
-			_flying          = root.Q<Label>("flying");
-			_crouching       = root.Q<Label>("crouching");
-			_sprinting       = root.Q<Label>("sprinting");
+			_airControl = root.Q<Label>("air-control");
+			_flySpeed = root.Q<Label>("fly-speed");
+			_mayFly = root.Q<Label>("may-fly");
+			_immobilized = root.Q<Label>("immobilized");
+			_flying = root.Q<Label>("flying");
+			_crouching = root.Q<Label>("crouching");
+			_sprinting = root.Q<Label>("sprinting");
 			_nameplateVisible = root.Q<Label>("nameplate-visible");
 			_healthbarVisible = root.Q<Label>("healthbar-visible");
-			_propertiesList  = root.Q<VisualElement>("properties-list");
+			_propertiesList = root.Q<VisualElement>("properties-list");
 			_propertiesEmpty = root.Q<VisualElement>("properties-empty");
-			_partsList       = root.Q<VisualElement>("parts-list");
-			_partsEmpty      = root.Q<VisualElement>("parts-empty");
+			_partsList = root.Q<VisualElement>("parts-list");
+			_partsEmpty = root.Q<VisualElement>("parts-empty");
 
 			_back.RegisterCallback<ClickEvent>(OnBackClicked);
 
@@ -207,16 +302,17 @@ namespace Nox.Sessions.Runtime.Editor {
 			return _content = root;
 		}
 
-		//  Scheduler 
+		//  Scheduler
 
-		private static string FormatVec3(Vector3 v)    => $"({v.x:F2}, {v.y:F2}, {v.z:F2})";
+		private static string FormatVec3(Vector3 v)
+			=> $"({v.x:F2}, {v.y:F2}, {v.z:F2})";
 		private static string FormatEuler(Quaternion q) { var e = q.eulerAngles; return $"({e.x:F1}\u00b0, {e.y:F1}\u00b0, {e.z:F1}\u00b0)"; }
 
 		private static string FormatValue(object v) {
-			if (v == null)         return "null";
+			if (v == null) return "null";
 			if (v is not byte[] b) return v.ToString();
-			var count   = Math.Min(b.Length, 10);
-			var hex     = BitConverter.ToString(b, 0, count).Replace('-', ' ');
+			var count = Math.Min(b.Length, 10);
+			var hex = BitConverter.ToString(b, 0, count).Replace('-', ' ');
 			var ellipsis = b.Length > 10 ? "..." : "";
 			return $"Buffer ({b.Length}) {hex}{ellipsis}";
 		}
@@ -229,7 +325,7 @@ namespace Nox.Sessions.Runtime.Editor {
 
 		/// <summary>
 		/// Shortens a path-like value by dropping whole leading segments, so the cut falls on a separator
-		/// instead of in the middle of a segment: <c>/a/b/c/d</c> becomes <c>…/c/d</c>. The tail is kept,
+		/// instead of in the middle of a segment: <c>/a/b/c/d</c> becomes <c>.../c/d</c>. The tail is kept,
 		/// like the left ellipsis of the labels. A value without separator is returned as-is and left to
 		/// the label ellipsis.
 		/// </summary>
@@ -238,16 +334,16 @@ namespace Nox.Sessions.Runtime.Editor {
 				return value;
 
 			var segments = value.Split('/');
-			var result   = segments[segments.Length - 1];
+			var result = segments[segments.Length - 1];
 
 			for (var i = segments.Length - 2; i >= 0; i--) {
 				var candidate = segments[i] + "/" + result;
-				if (candidate.Length + 2 > PathMaxLength) // +2 for the leading "…/"
+				if (candidate.Length + 2 > PathMaxLength) // +2 for the leading ".../"
 					break;
 				result = candidate;
 			}
 
-			return "…/" + result;
+			return ".../" + result;
 		}
 
 		/// <summary>
@@ -274,16 +370,26 @@ namespace Nox.Sessions.Runtime.Editor {
 				var now2 = DateTime.UtcNow;
 				foreach (var part in parts)
 					if (_partRows.TryGetValue(part.Id, out var partRow)) {
-						if (part.Updated != partRow.LastUpdated) {
-							partRow.PosLabel.text = FormatVec3(part.Position);
-							partRow.RotLabel.text = FormatEuler(part.Rotation);
-							partRow.ChangedAt     = now2;
-							partRow.LastUpdated   = part.Updated;
-							_partRows[part.Id]    = partRow;
+						// An offline part reads its live transform from the controller and only bumps
+						// `Updated` when something writes it, so the rendered values are compared as
+						// well: otherwise the row would never move.
+						var position = FormatVec3(part.Position);
+						var rotation = FormatEuler(part.Rotation);
+						var changed = part.Updated != partRow.LastUpdated
+									|| partRow.PosLabel.text != position
+									|| partRow.RotLabel.text != rotation;
+
+						if (changed) {
+							partRow.PosLabel.text = position;
+							partRow.RotLabel.text = rotation;
+							partRow.ChangedAt = now2;
+							partRow.LastUpdated = part.Updated;
+							_partRows[part.Id] = partRow;
 						}
+
 						var elapsed2 = (float)(now2 - partRow.ChangedAt).TotalSeconds;
-						var alpha2   = Mathf.Max(0f, 0.5f - elapsed2 / FadeDuration * 0.5f);
-						partRow.Container.style.backgroundColor = new Color(0.2f, 0.6f, 1f, alpha2);
+						var alpha2 = Mathf.Max(0f, 0.5f - elapsed2 / FadeDuration * 0.5f);
+						SetHighlight(partRow.Container, alpha2);
 					}
 			}
 
@@ -298,7 +404,7 @@ namespace Nox.Sessions.Runtime.Editor {
 			// A property can also change group without the count changing (an UnassignedProperty gets
 			// bound to an avatar parameter, or released back): rebuild so it moves to the right section.
 			foreach (var property in properties)
-				if (_rows.TryGetValue(property.Key, out var existing) && existing.Group != GetPropertyGroup(property).Label) {
+				if (_rows.TryGetValue(property.Key, out var existing) && existing.Group != GroupLabel(GetPropertyGroup(property))) {
 					LoadProperties();
 					return;
 				}
@@ -309,36 +415,49 @@ namespace Nox.Sessions.Runtime.Editor {
 				if (!_rows.TryGetValue(property.Key, out var row))
 					continue;
 
-				// Detect change by UpdatedAt
-				if (property.UpdatedAt != row.LastUpdatedAt) {
-						var value = FormatValue(property.Value);
-						var flags = property.Flags.ToString();
+				// The value is read first on purpose: a live property (a parameter bound to the avatar)
+				// only stamps its UpdatedAt when it is read, so comparing beforehand would never
+				// report a change.
+				var value = FormatValue(property.Value);
+				var changed = property.UpdatedAt != row.LastUpdatedAt || row.Value != value;
 
-						row.ValueLabel.text = ShortenPath(value);
-						row.FlagsLabel.text = flags;
-						SetTooltip(row.ValueLabel, value);
-						SetTooltip(row.FlagsLabel, flags);
+				if (changed) {
+					var flags = property.Flags.ToString();
+
+					row.ValueLabel.text = ShortenPath(value);
+					row.FlagsLabel.text = flags;
+					SetTooltip(row.ValueLabel, value);
+					SetTooltip(row.FlagsLabel, flags);
+
+					row.Value = value;
+					row.LastUpdatedAt = property.UpdatedAt;
+					row.ChangedAt = now;
 					_rows[property.Key] = row;
 				}
 
 				// Fade background: alpha from 0.5 to 0 over FadeDuration seconds
 				var elapsed = (float)(now - row.ChangedAt).TotalSeconds;
-				var alpha   = Mathf.Max(0f, 0.5f - elapsed / FadeDuration * 0.5f);
-				row.Container.style.backgroundColor = new Color(0.2f, 0.6f, 1f, alpha);
+				var alpha = Mathf.Max(0f, 0.5f - elapsed / FadeDuration * 0.5f);
+				SetHighlight(row.Container, alpha);
 			}
 		}
 
-		//  Navigation 
+		//  Navigation
 
-		private void OnBackClicked(ClickEvent evt) {
+		private void OnBackClicked(ClickEvent evt)
+			=> GoBackToSession();
+
+		/// <summary>Returns to the session page (the parent page of this one).</summary>
+		private void GoBackToSession() {
 			if (_session == null) {
 				Logger.LogWarning("No session to go back to");
+				GoBackToSessions();
 				return;
 			}
 
 			var data = new Dictionary<string, object> { { "session", _session } };
 
-			if (!Main.PanelAPI.TryGetPanel(new ResourceIdentifier(null, new[] { "session", "details" }), out var panel)) {
+			if (!SessionPanels.API.TryGetPanel(new ResourceIdentifier(null, new[] { "session", "details" }), out var panel)) {
 				Logger.LogError("SessionDetailsPanel not found");
 				return;
 			}
@@ -346,7 +465,17 @@ namespace Nox.Sessions.Runtime.Editor {
 			_window.SetActive(panel, data);
 		}
 
-		//  Display 
+		/// <summary>Returns to the sessions list (the root page of the session panels).</summary>
+		private void GoBackToSessions() {
+			if (!SessionPanels.API.TryGetPanel(new ResourceIdentifier(null, new[] { "session", "sessions" }), out var panel)) {
+				Logger.LogError("SessionsPanel not found");
+				return;
+			}
+
+			_window.SetActive(panel);
+		}
+
+		//  Display
 
 		private void LoadPlayerDetails() {
 			if (_player == null) {
@@ -354,10 +483,10 @@ namespace Nox.Sessions.Runtime.Editor {
 				return;
 			}
 
-			_title.text         = $"Player: {_player.Display}";
-			_playerId.text      = _player.Id.ToString();
-			_playerLocal.text   = _player.IsLocal ? "Yes" : "No";
-			_playerMaster.text  = _player.IsMaster ? "Yes" : "No";
+			_title.text = $"Player: {_player.Display}";
+			_playerId.text = _player.Id.ToString();
+			_playerLocal.text = _player.IsLocal ? "Yes" : "No";
+			_playerMaster.text = _player.IsMaster ? "Yes" : "No";
 
 			var display = _player.Display;
 			_playerDisplay.text = display;
@@ -372,7 +501,7 @@ namespace Nox.Sessions.Runtime.Editor {
 			RefreshStats();
 		}
 
-		//  Entity data 
+		//  Entity data
 
 		/// <summary>
 		/// Refreshes the entity data of the new model (team, vitals, movement, nameplate). Cheap reads:
@@ -387,38 +516,33 @@ namespace Nox.Sessions.Runtime.Editor {
 			var team = player.Team;
 
 			Set(_teamName, team?.Name ?? "No team");
-			Set(_teamId,   team != null ? team.Id.ToString() : "-");
+			Set(_teamId, team != null ? team.Id.ToString() : "-");
 
 			// The team name carries the colour of the team (the swatch next to it as well).
 			var teamColorId = team?.Id ?? -1;
 			if (teamColorId != _teamColorId) {
 				_teamColorId = teamColorId;
 
-				if (_teamColor != null) {
-					_teamColor.style.display = team != null ? DisplayStyle.Flex : DisplayStyle.None;
-					if (team != null)
-						_teamColor.style.backgroundColor = team.Color;
-				}
-
-				if (_teamName != null)
-					_teamName.style.color = team != null ? team.Color : StyleKeyword.Null;
+				SetVisible(_teamColor, team != null);
+				SetTint(_teamColor, team?.Color, background: true);
+				SetTint(_teamName, team?.Color);
 			}
 
-			Set(_health,    FormatFloat(player.Health));
+			Set(_health, FormatFloat(player.Health));
 			Set(_maxHealth, FormatFloat(player.MaxHealth));
 			Set(_invisible, FormatBool(player.IsInvisible));
 
-			Set(_walkSpeed,        FormatFloat(player.WalkSpeed));
+			Set(_walkSpeed, FormatFloat(player.WalkSpeed));
 			Set(_moveAcceleration, FormatFloat(player.MoveAcceleration));
-			Set(_jumpForce,        FormatFloat(player.JumpForce));
+			Set(_jumpForce, FormatFloat(player.JumpForce));
 			Set(_sprintMultiplier, FormatFloat(player.SprintMultiplier));
-			Set(_airControl,       FormatFloat(player.AirControl));
-			Set(_flySpeed,         FormatFloat(player.FlySpeed));
-			Set(_mayFly,           FormatBool(player.MayFly));
-			Set(_immobilized,      FormatBool(player.IsImmobilized));
-			Set(_flying,           FormatBool(player.IsFlying));
-			Set(_crouching,        FormatBool(player.IsCrouching));
-			Set(_sprinting,        FormatBool(player.IsSprinting));
+			Set(_airControl, FormatFloat(player.AirControl));
+			Set(_flySpeed, FormatFloat(player.FlySpeed));
+			Set(_mayFly, FormatBool(player.MayFly));
+			Set(_immobilized, FormatBool(player.IsImmobilized));
+			Set(_flying, FormatBool(player.IsFlying));
+			Set(_crouching, FormatBool(player.IsCrouching));
+			Set(_sprinting, FormatBool(player.IsSprinting));
 
 			Set(_nameplateVisible, FormatFlag(ReadFlag(player, "NameplateVisible")));
 			Set(_healthbarVisible, FormatFlag(ReadFlag(player, "HealthbarVisible")));
@@ -430,13 +554,13 @@ namespace Nox.Sessions.Runtime.Editor {
 		}
 
 		private static string FormatFloat(float value) => value.ToString("0.###");
-		private static string FormatBool(bool value)   => value ? "Yes" : "No";
+		private static string FormatBool(bool value) => value ? "Yes" : "No";
 
 		private static string FormatFlag(bool? value)
 			=> value switch {
-				true  => "Yes",
+				true => "Yes",
 				false => "No",
-				_     => "N/A",
+				_ => "N/A",
 			};
 
 		/// <summary>
@@ -455,24 +579,24 @@ namespace Nox.Sessions.Runtime.Editor {
 
 			var parts = _player?.GetParts();
 			if (parts == null || parts.Length == 0) {
-				if (_partsEmpty != null) _partsEmpty.style.display = DisplayStyle.Flex;
-				if (_partsList  != null) _partsList.style.display  = DisplayStyle.None;
+				SetVisible(_partsList, false);
+				SetVisible(_partsEmpty, true);
 				return;
 			}
 
-			if (_partsEmpty != null) _partsEmpty.style.display = DisplayStyle.None;
-			if (_partsList  != null) _partsList.style.display  = DisplayStyle.Flex;
+			SetVisible(_partsList, true);
+			SetVisible(_partsEmpty, false);
 
 			var itemAsset = _panel.API.AssetAPI.GetAsset<VisualTreeAsset>("panels/part-item.uxml");
-			var epoch     = DateTime.MinValue;
+			var epoch = DateTime.MinValue;
 			foreach (var part in parts) {
-				var item      = itemAsset.CloneTree();
+				var item = itemAsset.CloneTree();
 				var container = item.Q<VisualElement>();
-				var posLabel  = item.Q<Label>("position");
-				var rotLabel  = item.Q<Label>("rotation");
+				var posLabel = item.Q<Label>("position");
+				var rotLabel = item.Q<Label>("rotation");
 
 				var nameLabel = item.Q<Label>("name");
-				var name      = part.Id.ToEntityRig().ToString();
+				var name = part.Id.ToEntityRig().ToString();
 				nameLabel.text = name;
 				SetTooltip(nameLabel, name);
 				posLabel.text = FormatVec3(part.Position);
@@ -480,11 +604,11 @@ namespace Nox.Sessions.Runtime.Editor {
 
 				_partsList.Add(item);
 				_partRows[part.Id] = new PartRow {
-					Container   = container,
-					PosLabel    = posLabel,
-					RotLabel    = rotLabel,
+					Container = container,
+					PosLabel = posLabel,
+					RotLabel = rotLabel,
 					LastUpdated = part.Updated,
-					ChangedAt   = epoch,
+					ChangedAt = epoch,
 				};
 			}
 		}
@@ -497,8 +621,12 @@ namespace Nox.Sessions.Runtime.Editor {
 		private static PropertyGroup GetPropertyGroup(IProperty property) {
 			switch (property.GetType().Name) {
 				case "AvatarParameterProperty":
-					return new PropertyGroup(0, "Avatar Parameters",
-						"Bound to a live avatar parameter: read once per tick and sent according to its sync flags.");
+					return new PropertyGroup(
+						0, "Avatar Parameters",
+						"Bound to a live avatar parameter: read once per tick and sent according to its sync flags.",
+						categorized: true,
+						category: ParameterCategoryLanguage.Normalize(property.Category)
+					);
 				case "UnassignedProperty":
 					return new PropertyGroup(1, "Unassigned (key never declared)",
 						"A value arrived for a key this entity has no property for, so Nox.Relay stored it as-is. " +
@@ -506,24 +634,80 @@ namespace Nox.Sessions.Runtime.Editor {
 				case "Property":
 					return new PropertyGroup(2, "Raw",
 						"Plain key/value property declared by the entity itself.");
+				case "DataProperty":
+					return new PropertyGroup(2, "Data",
+						"Value of the entity data container: the state an offline session keeps for its player.");
 				default:
 					return new PropertyGroup(3, property.GetType().Name,
 						"Custom IProperty implementation.");
 			}
 		}
 
+		/// <summary>
+		/// Key of the section a property belongs to, used to detect a property that moved to another group
+		/// or another parameter category without the property count changing.
+		/// </summary>
+		private static string GroupLabel(PropertyGroup group)
+			=> group.Categorized
+				? group.Label + "/" + ParameterCategoryLanguage.NormalizedOrDefault(group.Category)
+				: group.Label;
+
+		/// <summary>
+		/// Shows or hides an element through the <c>hidden</c> class of <c>nox.style</c>: the panels
+		/// never set inline styles.
+		/// </summary>
+		private static void SetVisible(VisualElement element, bool visible)
+			=> element?.EnableInClassList("hidden", !visible);
+
+		/// <summary>
+		/// Applies a runtime colour (team colour) to an element. This is one of the few places that
+		/// write an inline style: a USS class cannot carry a value known only at runtime.
+		/// </summary>
+		private static void SetTint(VisualElement element, Color? color, bool background = false) {
+			if (element == null)
+				return;
+
+			if (color == null) {
+				if (background)
+					element.style.backgroundColor = StyleKeyword.Null;
+				else
+					element.style.color = StyleKeyword.Null;
+
+				return;
+			}
+
+			if (background)
+				element.style.backgroundColor = color.Value;
+			else
+				element.style.color = color.Value;
+		}
+
+		/// <summary>
+		/// Paints the "just changed" highlight of a row: the alpha decays every tick, so it cannot be
+		/// expressed as a USS class.
+		/// </summary>
+		private static void SetHighlight(VisualElement element, float alpha) {
+			if (element != null)
+				element.style.backgroundColor = new Color(0.2f, 0.6f, 1f, alpha);
+		}
+
 		private static VisualElement CreateGroupHeader(PropertyGroup group, int count) {
 			var header = new Label($"{group.Label}  ({count})");
 			header.tooltip = group.Description;
+			header.AddToClassList("group-header");
 
-			header.style.unityFontStyleAndWeight = FontStyle.Bold;
-			header.style.color                   = new Color(0.75f, 0.85f, 1f);
-			header.style.marginTop               = 10;
-			header.style.marginBottom            = 2;
-			header.style.marginLeft              = 2;
-			header.style.paddingLeft             = 6;
-			header.style.borderLeftWidth         = 2;
-			header.style.borderLeftColor         = new Color(0.35f, 0.55f, 0.9f);
+			return header;
+		}
+
+		/// <summary>
+		/// Header of a parameter category inside the avatar parameters: its label entry
+		/// (<c>avatar.parameters.categories.&lt;category&gt;.label</c>), with the description entry as tooltip.
+		/// </summary>
+		private static VisualElement CreateCategoryHeader(string category, int count) {
+			var header = new Label($"{ParameterCategoryLanguage.GetLabel(category)}  ({count})") {
+				tooltip = ParameterCategoryLanguage.GetDescription(category)
+			};
+			header.AddToClassList("group-header");
 
 			return header;
 		}
@@ -533,75 +717,105 @@ namespace Nox.Sessions.Runtime.Editor {
 			_rows.Clear();
 
 			if (_player is not IEntity entity) {
-				_propertiesEmpty.style.display = DisplayStyle.Flex;
-				_propertiesList.style.display  = DisplayStyle.None;
+				SetVisible(_propertiesList, false);
+				SetVisible(_propertiesEmpty, true);
 				return;
 			}
 
 			var properties = entity.GetProperties();
 
 			if (properties == null || properties.Length == 0) {
-				_propertiesEmpty.style.display = DisplayStyle.Flex;
-				_propertiesList.style.display  = DisplayStyle.None;
+				SetVisible(_propertiesList, false);
+				SetVisible(_propertiesEmpty, true);
 				return;
 			}
 
-			_propertiesEmpty.style.display = DisplayStyle.None;
-			_propertiesList.style.display  = DisplayStyle.Flex;
+			SetVisible(_propertiesList, true);
+			SetVisible(_propertiesEmpty, false);
 
 			var itemAsset = _panel.API.AssetAPI.GetAsset<VisualTreeAsset>("panels/property-item.uxml");
-			var epoch     = DateTime.MinValue;
 
 			// Group by concrete implementation instead of listing everything flat: that is what tells a
 			// parameter bound to the avatar apart from an incoming key this entity never declared.
 			var groups = properties
 				.Select(p => (Property: p, Group: GetPropertyGroup(p)))
-				.GroupBy(x => x.Group.Label)
-				.OrderBy(g => g.Min(x => x.Group.Order))
-				.ThenBy(g => g.Key, StringComparer.Ordinal);
+				.GroupBy(x => (x.Group.Order, x.Group.Label))
+				.OrderBy(g => g.Key.Order)
+				.ThenBy(g => g.Key.Label, StringComparer.Ordinal);
 
-			foreach (var group in groups) {
-				_propertiesList.Add(CreateGroupHeader(group.First().Group, group.Count()));
+			foreach (var group in groups)
+				AddPropertyGroup(itemAsset, group.ToList());
+		}
 
-				// Named properties first (alphabetical), then the raw keys ascending — so an
-				// unexplained key is easy to pick out and stays in the same place between rebuilds.
-				var ordered = group
-					.OrderBy(x => x.Property.Name == null ? 1 : 0)
-					.ThenBy(x => x.Property.Name ?? string.Empty, StringComparer.Ordinal)
-					.ThenBy(x => x.Property.Key);
+		/// <summary>
+		/// Adds a top-level group. The avatar parameters are split into one subsection per category, the
+		/// parameters without a category first in the « general » subsection; the other groups stay flat.
+		/// The subsections are ordered by category, not by their label (which depends on the language).
+		/// </summary>
+		private void AddPropertyGroup(VisualTreeAsset itemAsset, List<(IProperty Property, PropertyGroup Group)> items) {
+			var group = items[0].Group;
 
-				foreach (var (property, propertyGroup) in ordered) {
-					var item       = itemAsset.CloneTree();
-					var container  = item.Q<VisualElement>(); // root element of the template
-					var valueLabel = item.Q<Label>("value");
-					var flagsLabel = item.Q<Label>("flags");
+			_propertiesList.Add(CreateGroupHeader(group, items.Count));
 
-					var keyLabel = item.Q<Label>("key");
-					var key      = property.Name ?? $"Key: {property.Key}";
-					var value    = FormatValue(property.Value);
-					var flags    = property.Flags.ToString();
+			if (!group.Categorized) {
+				AddPropertyRows(itemAsset, items);
+				return;
+			}
 
-					keyLabel.text   = ShortenPath(key);
-					valueLabel.text = ShortenPath(value);
-					flagsLabel.text = flags;
+			var sections = items
+				.GroupBy(x => ParameterCategoryLanguage.Normalize(x.Group.Category))
+				.OrderBy(s => s.Key == null ? 0 : 1)
+				.ThenBy(s => s.Key ?? string.Empty, StringComparer.Ordinal);
 
-					SetTooltip(keyLabel, key);
-					SetTooltip(valueLabel, value);
-					SetTooltip(flagsLabel, flags);
+			foreach (var section in sections) {
+				_propertiesList.Add(CreateCategoryHeader(section.Key, section.Count()));
+				AddPropertyRows(itemAsset, section.ToList());
+			}
+		}
 
-					_propertiesList.Add(item);
+		/// <summary>
+		/// Adds the rows of a section: named properties first (alphabetical), then the raw keys ascending —
+		/// so an unexplained key is easy to pick out and stays in the same place between rebuilds.
+		/// </summary>
+		private void AddPropertyRows(VisualTreeAsset itemAsset, List<(IProperty Property, PropertyGroup Group)> items) {
+			var epoch = DateTime.MinValue;
 
-					_rows[property.Key] = new PropertyRow {
-						Container     = container,
-						ValueLabel    = valueLabel,
-						FlagsLabel    = flagsLabel,
-						Group         = propertyGroup.Label,
-						LastUpdatedAt = property.UpdatedAt,
-						ChangedAt     = epoch,
-					};
-				}
+			var ordered = items
+				.OrderBy(x => x.Property.Name == null ? 1 : 0)
+				.ThenBy(x => x.Property.Name ?? string.Empty, StringComparer.Ordinal)
+				.ThenBy(x => x.Property.Key);
+
+			foreach (var (property, propertyGroup) in ordered) {
+				var item = itemAsset.CloneTree();
+				var container = item.Q<VisualElement>(); // root element of the template
+				var valueLabel = item.Q<Label>("value");
+				var flagsLabel = item.Q<Label>("flags");
+
+				var keyLabel = item.Q<Label>("key");
+				var key = property.Name ?? $"Key: {property.Key}";
+				var value = FormatValue(property.Value);
+				var flags = property.Flags.ToString();
+
+				keyLabel.text = ShortenPath(key);
+				valueLabel.text = ShortenPath(value);
+				flagsLabel.text = flags;
+
+				SetTooltip(keyLabel, key);
+				SetTooltip(valueLabel, value);
+				SetTooltip(flagsLabel, flags);
+
+				_propertiesList.Add(item);
+
+				_rows[property.Key] = new PropertyRow {
+					Container = container,
+					ValueLabel = valueLabel,
+					FlagsLabel = flagsLabel,
+					Group = GroupLabel(propertyGroup),
+					Value = value,
+					LastUpdatedAt = property.UpdatedAt,
+					ChangedAt = epoch,
+				};
 			}
 		}
 	}
 }
-#endif

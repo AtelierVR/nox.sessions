@@ -1,0 +1,8 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/nox.cck/Resources/nox.style.uss?fileID=7433441132597879392&amp;guid=956d93e835714844b98277f4fdbd77d3&amp;type=3#nox.style" />
+    <ui:VisualElement class="row row-sm">
+        <ui:Label name="name" text="Base" class="col-sm text-bold text-ellipsis" />
+        <ui:Label name="position" text="(0.00, 0.00, 0.00)" class="flex-grow flex-shrink muted text-ellipsis" />
+        <ui:Label name="rotation" text="(0.0°, 0.0°, 0.0°)" class="col-md muted text-ellipsis" />
+    </ui:VisualElement>
+</ui:UXML>
