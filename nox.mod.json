@@ -2,7 +2,7 @@
   "type": "mod",
   "id": "nox.sessions",
   "provides": [
-    "session"
+    "sessions"
   ],
   "name": "Sessions",
   "version": "1.0.x",
@@ -94,9 +94,21 @@
       "Nox.Sessions.Runtime.Main"
     ],
     "editor": [
-      "Nox.Sessions.Runtime.Editor.SessionsPanel",
-      "Nox.Sessions.Runtime.Editor.SessionDetailsPanel",
-      "Nox.Sessions.Runtime.Editor.PlayerPanel"
+      {
+        "assembly": "Nox.Sessions.Editor",
+        "namespace": "Nox.Sessions.Runtime.Editor",
+        "class": "SessionsPanel"
+      },
+      {
+        "assembly": "Nox.Sessions.Editor",
+        "namespace": "Nox.Sessions.Runtime.Editor",
+        "class": "SessionDetailsPanel"
+      },
+      {
+        "assembly": "Nox.Sessions.Editor",
+        "namespace": "Nox.Sessions.Runtime.Editor",
+        "class": "PlayerPanel"
+      }
     ],
     "client": [
       "Nox.Sessions.Clients.Client"

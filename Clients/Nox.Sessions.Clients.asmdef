@@ -1,7 +1,8 @@
-{
+﻿{
     "name": "Nox.Sessions.Clients",
     "rootNamespace": "",
     "references": [
+        "Nox.CCK.Assets",
         "UniTask",
         "Nox.CCK",
         "Nox.Sessions",

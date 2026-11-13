@@ -1,7 +1,8 @@
-{
+﻿{
     "name": "Nox.Sessions.Runtime",
     "rootNamespace": "",
     "references": [
+        "Nox.CCK.Assets",
         "UniTask",
         "Nox.CCK",
         "Nox.Sessions",
@@ -16,7 +17,6 @@
         "Nox.UI",
         "Nox.CCK.Settings",
         "Nox.Terminal",
-        "Nox.Editor.Panel",
         "Nox.Avatars",
         "Nox.Worlds",
         "Nox.Servers"
