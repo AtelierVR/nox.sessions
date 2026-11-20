@@ -29,6 +29,10 @@ MonoBehaviour:
       value: "Max Entity Distance"
     - key: settings.entry.sessions.visual.clear_physical.label
       value: "Clear Physical"
+    - key: settings.group.sessions.ui.label
+      value: "Interface"
+    - key: settings.entry.sessions.ui.double_press_delay.label
+      value: "Double Press Delay"
     - key: terminal.command.respawn.short
       value: Respawn the local player
     - key: terminal.command.players.short

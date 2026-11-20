@@ -15,6 +15,7 @@
         "Nox.CCK.Sessions",
         "Nox.Settings",
         "Nox.UI",
+        "Nox.CCK.UI",
         "Nox.CCK.Settings",
         "Nox.Terminal",
         "Nox.Avatars",
