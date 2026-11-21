@@ -20,7 +20,9 @@
         "Nox.Terminal",
         "Nox.Avatars",
         "Nox.Worlds",
-        "Nox.Servers"
+        "Nox.Servers",
+        "Nox.CCK.Interactions.Network",
+        "Nox.CCK.Worlds.Entities"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 using Nox.CCK;
 using Nox.CCK.Properties;
@@ -49,11 +50,19 @@ namespace Nox.Sessions {
 		public IState State { get; }
 
 		/// <summary>
+		/// The clock shared by every client of the session (the server time): a value stamped with it
+		/// can be extrapolated locally instead of being sent again. <see cref="DateTime.MinValue"/> when
+		/// the session has no measured clock yet.
+		/// </summary>
+		public DateTime Time
+			=> DateTime.MinValue;
+
+		/// <summary>
 		/// Disposes the session and releases all associated resources.
 		/// </summary>
 		/// <returns></returns>
 		public UniTask Dispose();
-		
+
 		/// <summary>
 		/// Updates the session state.
 		/// </summary>

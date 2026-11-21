@@ -33,6 +33,7 @@ namespace Nox.CCK.Sessions {
 	public sealed class TeamRegistry : ITeamSession {
 		private readonly List<ITeam> _teams = new();
 		private readonly Dictionary<long, TeamRelation> _relations = new();
+		private readonly HashSet<long> _collisions = new();
 		private int _nextId = 1;
 
 		/// <inheritdoc />
@@ -76,12 +77,16 @@ namespace Nox.CCK.Sessions {
 
 			_teams.Remove(team);
 
-			// Drop the relations involving the removed team
+			// Drop the relations and the collision rules involving the removed team
 			foreach (var key in new List<long>(_relations.Keys)) {
 				var (a, b) = Unpack(key);
 				if (a == id || b == id)
 					_relations.Remove(key);
 			}
+
+			foreach (var key in new List<long>(_collisions))
+				if (Unpack(key).Item1 == id || Unpack(key).Item2 == id)
+					_collisions.Remove(key);
 
 			OnTeamRemoved.Invoke(team);
 			return true;
@@ -109,6 +114,27 @@ namespace Nox.CCK.Sessions {
 
 			_relations[Pack(team.Id, other.Id)] = relation;
 			_relations[Pack(other.Id, team.Id)] = relation;
+		}
+
+		/// <inheritdoc />
+		public bool GetCollision(ITeam team, ITeam other)
+			=> team != null
+				&& other != null
+				&& _collisions.Contains(Pack(team.Id, other.Id));
+
+		/// <inheritdoc />
+		public void SetCollision(ITeam team, ITeam other, bool collide) {
+			if (team == null || other == null)
+				return;
+
+			if (collide) {
+				_collisions.Add(Pack(team.Id, other.Id));
+				_collisions.Add(Pack(other.Id, team.Id));
+				return;
+			}
+
+			_collisions.Remove(Pack(team.Id, other.Id));
+			_collisions.Remove(Pack(other.Id, team.Id));
 		}
 
 		private static long Pack(int a, int b)

@@ -4,7 +4,7 @@ using Nox.Players;
 using UnityEngine.Events;
 
 namespace Nox.Sessions {
-	public interface INetSession : ISession {
+	public interface INetworkSession : ISession {
 		/// <summary>
 		/// Indicates whether the session is currently connected to the network.
 		/// </summary>
@@ -69,13 +69,13 @@ namespace Nox.Sessions {
 		/// Invoked once the session is connected again and back in its room after a disconnection.
 		/// </summary>
 		public UnityEvent OnReconnected { get; }
-		
+
 		/// <summary>
 		/// Invoked when the ping value changes significantly.
 		/// Provides the new ping value in milliseconds.
 		/// </summary>
 		public UnityEvent<double> OnPingChanged { get; }
-		
+
 		/// <summary>
 		/// Emits a custom event to the session.
 		/// Is emitting from local player.

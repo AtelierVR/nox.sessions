@@ -13,6 +13,7 @@
         "Nox.Entities",
         "Nox.Players",
         "Nox.Avatars",
+        "Nox.Interactions",
         "UniTask"
     ],
     "includePlatforms": [

@@ -24,10 +24,13 @@ namespace Nox.Sessions {
 		/// <summary>Entity id assigned by the relay.</summary>
 		uint Id { get; }
 
-		/// <summary>Entity kind on the relay entity channel (e.g. <c>"prop"</c>, <c>"mirror"</c>).</summary>
-		string Kind { get; }
+		/// <summary>
+		/// Type of the entity: the CRC32 of its type name (<c>0</c> for a player). For an entity placed
+		/// in the world it is the CRC32 of the world object, so every client recognises it.
+		/// </summary>
+		uint Type { get; }
 
-		/// <summary>Entity id of the player the entity is attached to (<c>0</c> = world).</summary>
+		/// <summary>Entity id of the player owning the entity (its creator).</summary>
 		uint OwnerId { get; }
 
 		/// <summary>Entity id of the sender that triggered the spawn.</summary>

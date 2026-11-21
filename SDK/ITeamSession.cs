@@ -38,5 +38,16 @@ namespace Nox.Sessions {
 
 		/// <summary>Set the (symmetrical) relation between two teams.</summary>
 		void SetRelation(ITeam team, ITeam other, TeamRelation relation);
+
+		/// <summary>
+		/// Whether the bodies of two teams collide. The players of a session never collide with each
+		/// other, unless the two teams they belong to answer <c>true</c> here: an entity without a team
+		/// never collides. Passing the same team twice declares whether its own members collide.
+		/// </summary>
+		bool GetCollision(ITeam team, ITeam other)
+			=> false;
+
+		/// <summary>Set the (symmetrical) collision between the bodies of two teams.</summary>
+		void SetCollision(ITeam team, ITeam other, bool collide) { }
 	}
 }
