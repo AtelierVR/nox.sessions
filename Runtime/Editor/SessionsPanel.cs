@@ -140,7 +140,7 @@ namespace Nox.Sessions.Runtime.Editor {
 
 			Set(row.State, FormatState(session.State));
 
-			if (session is not INetSession net) {
+			if (session is not INetworkSession net) {
 				Set(row.Connection, "N/A");
 				SetVisible(row.NetInfo, false);
 				return;
@@ -246,7 +246,7 @@ namespace Nox.Sessions.Runtime.Editor {
 			row.OnState = _ => ApplyRow(row);
 			session.OnStateChanged.AddListener(row.OnState);
 
-			if (session is not INetSession net)
+			if (session is not INetworkSession net)
 				return;
 
 			row.OnConnected = () => ApplyRow(row);
@@ -273,7 +273,7 @@ namespace Nox.Sessions.Runtime.Editor {
 			if (row.OnState != null)
 				session.OnStateChanged.RemoveListener(row.OnState);
 
-			if (session is not INetSession net)
+			if (session is not INetworkSession net)
 				return;
 
 			if (row.OnConnected != null) net.OnConnected.RemoveListener(row.OnConnected);

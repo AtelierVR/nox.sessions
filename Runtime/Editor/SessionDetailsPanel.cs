@@ -72,6 +72,8 @@ namespace Nox.Sessions.Runtime.Editor {
 		private Label _worldId;
 		private VisualElement _playersList;
 		private VisualElement _playersEmpty;
+		private VisualElement _entitiesList;
+		private VisualElement _entitiesEmpty;
 		private VisualElement _teamsList;
 		private VisualElement _teamsEmpty;
 
@@ -87,8 +89,10 @@ namespace Nox.Sessions.Runtime.Editor {
 			_session.OnPlayerJoined.AddListener(OnPlayerChanged);
 			_session.OnPlayerLeft.AddListener(OnPlayerChanged);
 			_session.OnStateChanged.AddListener(OnStateChanged);
+			_session.OnEntityRegistered.AddListener(OnEntityChanged);
+			_session.OnEntityUnregistered.AddListener(OnEntityChanged);
 
-			if (_session is INetSession netSession) {
+			if (_session is INetworkSession netSession) {
 				netSession.OnConnected.AddListener(OnConnectionChanged);
 				netSession.OnDisconnected.AddListener(OnDisconnectionChanged);
 				netSession.OnPingChanged.AddListener(OnPingChanged);
@@ -122,8 +126,10 @@ namespace Nox.Sessions.Runtime.Editor {
 				_session.OnPlayerJoined.RemoveListener(OnPlayerChanged);
 				_session.OnPlayerLeft.RemoveListener(OnPlayerChanged);
 				_session.OnStateChanged.RemoveListener(OnStateChanged);
+				_session.OnEntityRegistered.RemoveListener(OnEntityChanged);
+				_session.OnEntityUnregistered.RemoveListener(OnEntityChanged);
 
-				if (_session is INetSession netSession) {
+				if (_session is INetworkSession netSession) {
 					netSession.OnConnected.RemoveListener(OnConnectionChanged);
 					netSession.OnDisconnected.RemoveListener(OnDisconnectionChanged);
 					netSession.OnPingChanged.RemoveListener(OnPingChanged);
@@ -159,6 +165,10 @@ namespace Nox.Sessions.Runtime.Editor {
 			RefreshTeams();
 		}
 
+		/// <summary>An entity of the session was registered or unregistered: the entities list follows.</summary>
+		private void OnEntityChanged(IEntity entity)
+			=> RefreshEntities();
+
 		/// <summary>A team was created: it appears in the list, with no member yet.</summary>
 		private void OnTeamCreated(ITeam team)
 			=> RefreshTeamsAndPlayers();
@@ -190,7 +200,7 @@ namespace Nox.Sessions.Runtime.Editor {
 		private void OnConnectionChanged() {
 			if (_sessionConnected != null)
 				_sessionConnected.text = "Yes";
-			if (_session is INetSession netSession) {
+			if (_session is INetworkSession netSession) {
 				if (_sessionPing != null)
 					_sessionPing.text = $"{netSession.Ping:F0} ms";
 				if (_sessionTickRate != null)
@@ -245,6 +255,8 @@ namespace Nox.Sessions.Runtime.Editor {
 			_worldId = root.Q<Label>("world-id");
 			_playersList = root.Q<VisualElement>("players-list");
 			_playersEmpty = root.Q<VisualElement>("players-empty");
+			_entitiesList = root.Q<VisualElement>("entities-list");
+			_entitiesEmpty = root.Q<VisualElement>("entities-empty");
 			_teamsList = root.Q<VisualElement>("teams-list");
 			_teamsEmpty = root.Q<VisualElement>("teams-empty");
 
@@ -278,7 +290,7 @@ namespace Nox.Sessions.Runtime.Editor {
 			_sessionId.text = _session.Id;
 			_sessionState.text = _session.State?.Status.ToString() ?? "Unknown";
 
-			if (_session is INetSession netSession) {
+			if (_session is INetworkSession netSession) {
 				_sessionConnected.text = netSession.IsConnected ? "Yes" : "No";
 				_sessionPing.text = netSession.IsConnected ? $"{netSession.Ping:F0} ms" : "N/A";
 				_sessionTickRate.text = netSession.IsConnected ? $"{netSession.TickRate} t/s" : "N/A";
@@ -296,7 +308,101 @@ namespace Nox.Sessions.Runtime.Editor {
 
 			RefreshTeams();
 			RefreshPlayers();
+			RefreshEntities();
 		}
+
+		/// <summary>
+		/// Lists the entities of the session that are not players (props, world objects, networked
+		/// behaviours): the players have their own list above.
+		/// </summary>
+		private void RefreshEntities() {
+			_entitiesList?.Clear();
+
+			var registered = _session?.Entities?.GetEntities() ?? Array.Empty<IEntity>();
+
+			var entities = new List<(IEntity Entity, bool Local)>();
+
+			foreach (var entity in registered)
+				if (entity is not IPlayer)
+					entities.Add((entity, false));
+
+			foreach (var entity in FindLocalEntities(registered))
+				entities.Add((entity, true));
+
+			if (entities.Count == 0) {
+				SetVisible(_entitiesList, false);
+				SetVisible(_entitiesEmpty, true);
+				return;
+			}
+
+			SetVisible(_entitiesList, true);
+			SetVisible(_entitiesEmpty, false);
+
+			var itemAsset = _panel.API.AssetAPI.GetAsset<VisualTreeAsset>("panels/entity-item.uxml");
+
+			foreach (var (entity, local) in entities) {
+				var item = itemAsset.CloneTree();
+
+				var display = item.Q<Label>("display");
+				display.text = entity.GetType().Name;
+				display.tooltip = display.text;
+
+				item.Q<Label>("id").text = $"ID: {entity.Id}";
+
+				var tags = item.Q<VisualElement>("tags");
+
+				// An entity the session did not register is not networked yet: it is shown so a missing
+				// entity (a video player waiting for its spawn, a prop not published) is visible here.
+				if (local)
+					AddTag(tags, "Local", "badge-muted");
+
+				if (entity is ISessionEntity)
+					AddTag(tags, "Session", "badge-info");
+				if (entity is IOwnedEntity)
+					AddTag(tags, "Owned", "badge-warning");
+				if (entity is IPhysicalEntity { PhysicalState: not PhysicalState.None })
+					AddTag(tags, "Physical", "badge-muted");
+
+				item.Q<Button>("view").RegisterCallback<ClickEvent>(_ => OpenEntity(entity));
+
+				_entitiesList.Add(item);
+			}
+		}
+
+		/// <summary>
+		/// Entities of the running world the session did not register: the components implementing
+		/// <see cref="IEntity"/> that were not wrapped by a session entity (yet).
+		/// <para>
+		/// The scan is narrowed to the live objects: the prepared copy of the world
+		/// (<c>[Reference] …</c>, inactive) and the inactive objects of the editor scenes hold entities
+		/// that are not part of the session, and an entity with an id is already listed through the
+		/// session registry.
+		/// </para>
+		/// </summary>
+		private static IEntity[] FindLocalEntities(IEntity[] registered) {
+			var locals = new List<IEntity>();
+
+			foreach (var behaviour in Resources.FindObjectsOfTypeAll<MonoBehaviour>()) {
+				if (behaviour is not IEntity entity || entity is IPlayer || entity.Id != 0)
+					continue;
+
+				if (!behaviour.gameObject.scene.IsValid() || !behaviour.gameObject.activeInHierarchy)
+					continue;
+
+				if (behaviour.transform.root.name.StartsWith(ReferenceRoot))
+					continue;
+
+				if (Array.IndexOf(registered, entity) >= 0 || locals.Contains(entity))
+					continue;
+
+				locals.Add(entity);
+			}
+
+			return locals.ToArray();
+		}
+
+		/// <summary>Root name of the prepared (inactive) copy of a world scene.</summary>
+		private const string ReferenceRoot = "[Reference]";
 
 		private void RefreshPlayers() {
 			_playersList?.Clear();
@@ -440,14 +546,18 @@ namespace Nox.Sessions.Runtime.Editor {
 			tags.Add(tag);
 		}
 
-		private void OpenPlayer(IPlayer player) {
+		private void OpenPlayer(IPlayer player)
+			=> OpenEntity(player);
+
+		/// <summary>Opens the details page of an entity: the same page as a player, fed with an entity.</summary>
+		private void OpenEntity(IEntity entity) {
 			var data = new Dictionary<string, object> {
 				{ "session", _session },
-				{ "player", player }
+				{ "entity", entity }
 			};
 
 			if (!SessionPanels.API.TryGetPanel(new ResourceIdentifier(null, new[] { "session", "player" }), out var panel)) {
-				Logger.LogError("PlayerPanel not found");
+				Logger.LogError("EntityPanel not found");
 				return;
 			}
 

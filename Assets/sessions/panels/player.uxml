@@ -6,15 +6,15 @@
             <ui:Label name="title" text="Player Details" class="text-lg flex-grow flex-basis-0 text-ellipsis" />
         </ui:VisualElement>
         <ui:ScrollView class="flex-grow">
-            <!-- Player Info -->
-            <ui:GroupBox class="p-8 m-0 border-b">
-                <ui:Label text="Player Information" class="text-lg mb-8" />
+            <!-- Entity Info -->
+            <ui:GroupBox name="info-section" class="p-8 m-0 border-b">
+                <ui:Label name="info-title" text="Player Information" class="text-lg mb-8" />
                 <ui:VisualElement class="kv">
                     <ui:Label text="ID" class="kv-label" />
                     <ui:Label name="player-id" text="-" class="kv-value" />
                 </ui:VisualElement>
                 <ui:VisualElement class="kv">
-                    <ui:Label text="Display Name" class="kv-label" />
+                    <ui:Label name="display-label" text="Display Name" class="kv-label" />
                     <ui:Label name="player-display" text="-" class="kv-value text-ellipsis" />
                 </ui:VisualElement>
                 <ui:VisualElement class="kv">
@@ -27,8 +27,46 @@
                 </ui:VisualElement>
             </ui:GroupBox>
 
+            <!-- Ownership -->
+            <ui:GroupBox name="ownership-section" class="p-8 m-0 border-b hidden">
+                <ui:Label text="Ownership" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Owner" class="kv-label" />
+                    <ui:Label name="owner-display" text="-" class="kv-value text-ellipsis" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Owner Id" class="kv-label" />
+                    <ui:Label name="owner-id" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Is Owner" class="kv-label" />
+                    <ui:Label name="owner-is-owner" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Owner Local" class="kv-label" />
+                    <ui:Label name="owner-local" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Owner Master" class="kv-label" />
+                    <ui:Label name="owner-master" text="-" class="kv-value" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Physical -->
+            <ui:GroupBox name="physical-section" class="p-8 m-0 border-b hidden">
+                <ui:Label text="Physical" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="State" class="kv-label" />
+                    <ui:Label name="physical-state" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Body" class="kv-label" />
+                    <ui:Label name="physical-body" text="-" class="kv-value text-ellipsis" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
             <!-- Avatar Info -->
-            <ui:GroupBox class="p-8 m-0 border-b">
+            <ui:GroupBox name="avatar-section" class="p-8 m-0 border-b">
                 <ui:Label text="Avatar" class="text-lg mb-8" />
                 <ui:VisualElement class="kv">
                     <ui:Label text="Identifier" class="kv-label" />
@@ -37,7 +75,7 @@
             </ui:GroupBox>
 
             <!-- Team -->
-            <ui:GroupBox class="p-8 m-0 border-b">
+            <ui:GroupBox name="team-section" class="p-8 m-0 border-b">
                 <ui:Label text="Team" class="text-lg mb-8" />
                 <ui:VisualElement class="kv">
                     <ui:Label text="Name" class="kv-label" />
@@ -53,7 +91,7 @@
             </ui:GroupBox>
 
             <!-- Vitals -->
-            <ui:GroupBox class="p-8 m-0 border-b">
+            <ui:GroupBox name="vitals-section" class="p-8 m-0 border-b">
                 <ui:Label text="Vitals" class="text-lg mb-8" />
                 <ui:VisualElement class="kv">
                     <ui:Label text="Health" class="kv-label" />
@@ -70,7 +108,7 @@
             </ui:GroupBox>
 
             <!-- Movement -->
-            <ui:GroupBox class="p-8 m-0 border-b">
+            <ui:GroupBox name="movement-section" class="p-8 m-0 border-b">
                 <ui:Label text="Movement" class="text-lg mb-8" />
                 <ui:VisualElement class="kv">
                     <ui:Label text="Walk Speed" class="kv-label" />
@@ -119,7 +157,7 @@
             </ui:GroupBox>
 
             <!-- Nameplate -->
-            <ui:GroupBox class="p-8 m-0 border-b">
+            <ui:GroupBox name="nameplate-section" class="p-8 m-0 border-b">
                 <ui:Label text="Nameplate" class="text-lg mb-8" />
                 <ui:VisualElement class="kv">
                     <ui:Label text="Visible" class="kv-label" />
@@ -131,8 +169,67 @@
                 </ui:VisualElement>
             </ui:GroupBox>
 
+            <!-- Audio -->
+            <ui:GroupBox name="audio-section" class="p-8 m-0 border-b hidden">
+                <ui:Label text="Audio" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Clip" class="kv-label" />
+                    <ui:Label name="audio-clip" text="-" class="kv-value text-ellipsis" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Length" class="kv-label" />
+                    <ui:Label name="audio-length" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Frequency" class="kv-label" />
+                    <ui:Label name="audio-frequency" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Channels" class="kv-label" />
+                    <ui:Label name="audio-channels" text="-" class="kv-value" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Grabbable -->
+            <ui:GroupBox name="grabbable-section" class="p-8 m-0 border-b hidden">
+                <ui:Label text="Grabbable" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="State" class="kv-label" />
+                    <ui:Label name="grabbable-state" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Is Grabbable" class="kv-label" />
+                    <ui:Label name="grabbable-enabled" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Held" class="kv-label" />
+                    <ui:Label name="grabbable-held" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Grabbers" class="kv-label" />
+                    <ui:Label name="grabbable-grabbers" text="-" class="kv-value text-ellipsis" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Data -->
+            <ui:GroupBox name="data-section" class="p-8 m-0 border-b hidden">
+                <ui:Label text="Data" class="text-lg mb-8" />
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Type" class="kv-label" />
+                    <ui:Label name="data-type" text="-" class="kv-value text-ellipsis" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Count" class="kv-label" />
+                    <ui:Label name="data-count" text="-" class="kv-value" />
+                </ui:VisualElement>
+                <ui:VisualElement class="kv">
+                    <ui:Label text="Keys" class="kv-label" />
+                    <ui:Label name="data-keys" text="-" class="kv-value text-ellipsis" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
             <!-- Parts -->
-            <ui:GroupBox class="p-8 m-0 border-b">
+            <ui:GroupBox name="parts-section" class="p-8 m-0 border-b hidden">
                 <ui:Label text="Parts" class="text-lg mb-8" />
                 <ui:VisualElement name="parts-list" class="flex-grow" />
                 <ui:VisualElement name="parts-empty" class="hidden">
@@ -141,7 +238,7 @@
             </ui:GroupBox>
 
             <!-- Properties -->
-            <ui:GroupBox class="p-8 m-0">
+            <ui:GroupBox name="properties-section" class="p-8 m-0 hidden">
                 <ui:Label text="Properties" class="text-lg mb-8" />
                 <ui:VisualElement name="properties-list" class="flex-grow" />
                 <ui:VisualElement name="properties-empty" class="hidden">

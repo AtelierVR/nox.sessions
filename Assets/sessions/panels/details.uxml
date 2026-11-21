@@ -58,11 +58,20 @@
             </ui:GroupBox>
 
             <!-- Players List -->
-            <ui:GroupBox class="p-8 m-0">
+            <ui:GroupBox class="p-8 m-0 border-b">
                 <ui:Label text="Players" class="text-lg mb-8" />
                 <ui:VisualElement name="players-list" class="flex-grow" />
                 <ui:VisualElement name="players-empty" class="hidden">
                     <ui:Label text="No players" class="text-center muted" />
+                </ui:VisualElement>
+            </ui:GroupBox>
+
+            <!-- Entities List -->
+            <ui:GroupBox class="p-8 m-0">
+                <ui:Label text="Entities" class="text-lg mb-8" />
+                <ui:VisualElement name="entities-list" class="flex-grow" />
+                <ui:VisualElement name="entities-empty" class="hidden">
+                    <ui:Label text="No entities" class="text-center muted" />
                 </ui:VisualElement>
             </ui:GroupBox>
         </ui:ScrollView>
