@@ -93,6 +93,7 @@ namespace Nox.Sessions.Runtime {
 			commands?.Dispose();
 			commands = null;
 
+
 			_socket?.Dispose();
 			_socket = null;
 
@@ -277,8 +278,13 @@ namespace Nox.Sessions.Runtime {
 			foreach (var register in _registers) {
 				if (!register.TryMakeSession(name, options, out session))
 					continue;
+
 				CoreAPI.EventAPI.Emit("session_created", session);
 				Add(session);
+
+				if (session.State is { Status: Status.Error })
+					Close(session.Id).Forget();
+
 				return true;
 			}
 

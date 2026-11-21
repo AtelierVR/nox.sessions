@@ -28,21 +28,21 @@ namespace Nox.Sessions.Runtime.Modules {
 		public static readonly IScriptingModuleDefinition Module =
 			ScriptingModuleBuilder.Create("network")
 				.WithTags("session")
-				.AddVariable("time",             ctx => (ctx.Session as INetSession)?.Time ?? DateTime.UtcNow)
-				.AddVariable("connected",        ctx => (ctx.Session as INetSession)?.IsConnected ?? false)
-				.AddVariable("reconnecting",     ctx => (ctx.Session as INetSession)?.IsReconnecting ?? false)
-				.AddVariable("reconnectAttempt", ctx => (ctx.Session as INetSession)?.ReconnectAttempt ?? 0)
-				.AddVariable("ping",             ctx => (ctx.Session as INetSession)?.Ping ?? -1d)
-				.AddVariable("payloadSize",      ctx => (ctx.Session as INetSession)?.EventPayloadSize ?? 0)
+				.AddVariable("time",             ctx => (ctx.Session as INetworkSession)?.Time ?? DateTime.UtcNow)
+				.AddVariable("connected",        ctx => (ctx.Session as INetworkSession)?.IsConnected ?? false)
+				.AddVariable("reconnecting",     ctx => (ctx.Session as INetworkSession)?.IsReconnecting ?? false)
+				.AddVariable("reconnectAttempt", ctx => (ctx.Session as INetworkSession)?.ReconnectAttempt ?? 0)
+				.AddVariable("ping",             ctx => (ctx.Session as INetworkSession)?.Ping ?? -1d)
+				.AddVariable("payloadSize",      ctx => (ctx.Session as INetworkSession)?.EventPayloadSize ?? 0)
 				.AddVariable("tickrate",         ctx => {
-					var net = ctx.Session as INetSession;
+					var net = ctx.Session as INetworkSession;
 					if (net != null)
 						return net.TickRate;
 					var fps = Application.targetFrameRate;
 					return fps > 0 ? fps : 60;
 				})
 				.AddAsyncMethod("emit", async (ctx, args) => {
-					if (ctx.Session is not INetSession net)
+					if (ctx.Session is not INetworkSession net)
 						return false;
 					var eventId = args.Length > 0 && args[0] is double d
 						? (long)d

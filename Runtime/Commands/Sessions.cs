@@ -27,17 +27,17 @@ namespace Nox.Session.Runtime.Commands {
 
 		public string[] AutoComplete(string input, IContext context = null) {
 			var inputLower = input.ToLower();
-			
+
 			if (CommandWithPrefix.StartsWith(inputLower))
 				return new[] { CommandWithPrefix };
-			
+
 			if (!inputLower.StartsWith(CommandWithPrefix.ToLower()))
 				return Array.Empty<string>();
-			
+
 			var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 			if (parts.Length == 1)
 				return new[] { $"{CommandWithPrefix} list", $"{CommandWithPrefix} change", $"{CommandWithPrefix} leave" };
-			
+
 			if (parts.Length == 2) {
 				var subCommand = parts[1].ToLower();
 				if ("list".StartsWith(subCommand))
@@ -47,13 +47,13 @@ namespace Nox.Session.Runtime.Commands {
 				if ("leave".StartsWith(subCommand))
 					return new[] { $"{CommandWithPrefix} leave" };
 			}
-			
+
 			// Autocomplétion pour "change <id>"
 			if (parts.Length == 2 && parts[1].Equals("change", StringComparison.OrdinalIgnoreCase)) {
 				var sessions = Main.Instance.GetSessions().ToArray();
 				return sessions.Select(s => $"{CommandWithPrefix} change {s.Id}").ToArray();
 			}
-			
+
 			if (parts.Length == 3 && parts[1].Equals("change", StringComparison.OrdinalIgnoreCase)) {
 				var sessionIdPartial = parts[2].ToLower();
 				var sessions = Main.Instance.GetSessions()
@@ -61,13 +61,13 @@ namespace Nox.Session.Runtime.Commands {
 					.ToArray();
 				return sessions.Select(s => $"{CommandWithPrefix} change {s.Id}").ToArray();
 			}
-			
+
 			// Autocomplétion pour "leave [id]"
 			if (parts.Length == 2 && parts[1].Equals("leave", StringComparison.OrdinalIgnoreCase)) {
 				var sessions = Main.Instance.GetSessions().ToArray();
 				return sessions.Select(s => $"{CommandWithPrefix} leave {s.Id}").ToArray();
 			}
-			
+
 			if (parts.Length == 3 && parts[1].Equals("leave", StringComparison.OrdinalIgnoreCase)) {
 				var sessionIdPartial = parts[2].ToLower();
 				var sessions = Main.Instance.GetSessions()
@@ -75,7 +75,7 @@ namespace Nox.Session.Runtime.Commands {
 					.ToArray();
 				return sessions.Select(s => $"{CommandWithPrefix} leave {s.Id}").ToArray();
 			}
-			
+
 			return Array.Empty<string>();
 		}
 
@@ -97,12 +97,12 @@ namespace Nox.Session.Runtime.Commands {
 			}
 
 			var subCommand = parts[1].ToLower();
-			
+
 			switch (subCommand) {
 				case "list":
 					ListSessions(context);
 					return true;
-				
+
 				case "change":
 					if (parts.Length < 3) {
 						context.PrintLn(LanguageManager.Get("terminal.command.sessions.change.missing_id"));
@@ -111,13 +111,13 @@ namespace Nox.Session.Runtime.Commands {
 					}
 					ChangeSession(parts[2], context);
 					return true;
-				
+
 				case "leave":
 					// Si un ID est fourni, l'utiliser, sinon utiliser la session courante
 					var sessionIdToLeave = parts.Length >= 3 ? parts[2] : null;
 					LeaveSession(sessionIdToLeave, context);
 					return true;
-				
+
 				default:
 					context.PrintLn(LanguageManager.Get("terminal.command.sessions.unknown_subcommand", subCommand));
 					context.PrintLn(GetUsage());
@@ -146,8 +146,8 @@ namespace Nox.Session.Runtime.Commands {
 				if (session == null) continue;
 
 				var isCurrent = session.Id == currentSessionId;
-				var indicator = isCurrent 
-					? LanguageManager.Get("terminal.command.sessions.current") 
+				var indicator = isCurrent
+					? LanguageManager.Get("terminal.command.sessions.current")
 					: "";
 
 				var displayName = session.GetShortName() ?? session.Id;
@@ -155,11 +155,11 @@ namespace Nox.Session.Runtime.Commands {
 				var statusText = LanguageManager.Get(statusKey);
 
 				// Vérifier si c'est une session réseau
-				if (session is INetSession netSession) {
-					var connectionStatus = netSession.IsConnected 
+				if (session is INetworkSession netSession) {
+					var connectionStatus = netSession.IsConnected
 						? LanguageManager.Get("terminal.command.sessions.net.connected")
 						: LanguageManager.Get("terminal.command.sessions.net.disconnected");
-					
+
 					var pingText = netSession.IsConnected && netSession.Ping >= 0
 						? LanguageManager.Get("terminal.command.sessions.net.ping", netSession.Ping)
 						: "";
@@ -221,7 +221,7 @@ namespace Nox.Session.Runtime.Commands {
 			// Si aucun ID n'est fourni, utiliser la session courante
 			if (string.IsNullOrWhiteSpace(sessionId)) {
 				sessionId = Main.Instance.Current;
-				
+
 				if (string.IsNullOrWhiteSpace(sessionId)) {
 					context.PrintLn(LanguageManager.Get("terminal.command.sessions.leave.no_current"));
 					return;
@@ -241,10 +241,10 @@ namespace Nox.Session.Runtime.Commands {
 				if (isCurrent) {
 					await Main.Instance.SetCurrent(null);
 				}
-				
+
 				await session.Dispose();
 				Main.Instance.Remove(session);
-				
+
 				context.PrintLn(LanguageManager.Get("terminal.command.sessions.leave.success", displayName));
 			}
 			catch (Exception ex) {

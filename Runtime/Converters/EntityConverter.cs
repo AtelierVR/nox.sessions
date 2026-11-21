@@ -28,18 +28,18 @@ namespace Nox.Sessions.Runtime.Converters {
 			=> (bool)ctx.FromScript(value, typeof(bool));
 
 		private static Vector3 Position(IEntity entity)
-			=> entity is IMovingEntity moving 
-				? moving.Position 
+			=> entity is IMovingEntity moving
+				? moving.Position
 				: Vector3.zero;
 
 		private static Quaternion Rotation(IEntity entity)
-			=> entity is IMovingEntity moving 
-				? moving.Rotation 
+			=> entity is IMovingEntity moving
+				? moving.Rotation
 				: Quaternion.identity;
 
 		private static Vector3 Scale(IEntity entity)
-			=> entity is IMovingEntity moving 
-				? moving.Scale 
+			=> entity is IMovingEntity moving
+				? moving.Scale
 				: Vector3.one;
 
 		private static int Parts(IEntity entity)
@@ -173,11 +173,11 @@ namespace Nox.Sessions.Runtime.Converters {
 
 		/// <summary>Find a payload property of an entity by its (case-insensitive) name.</summary>
 		private static IProperty FindProperty(IEntity entity, object name) {
-			if (entity == null || name == null)
+			if (entity is not IPropertiesEntity props || name == null)
 				return null;
 
 			var wanted = name.ToString();
-			foreach (var property in entity.GetProperties()) {
+			foreach (var property in props.Properties) {
 				if (property.Name != null && string.Equals(property.Name, wanted, StringComparison.OrdinalIgnoreCase))
 					return property;
 			}

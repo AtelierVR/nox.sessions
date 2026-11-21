@@ -1,0 +1,27 @@
+{
+    "name": "Nox.CCK.Sessions.Network",
+    "rootNamespace": "",
+    "references": [
+        "Nox.Sessions",
+        "Nox.Worlds",
+        "Nox.Assets",
+        "Nox.CCK.Assets",
+        "Nox.Interactions",
+        "Nox.CCK.Interactions.Network",
+        "Nox.CCK.Worlds.Entities",
+        "Nox.CCK",
+        "Nox.CCK.Entities",
+        "Nox.Entities",
+        "Nox.Players",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
